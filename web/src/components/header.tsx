@@ -19,7 +19,7 @@ export const Header = () => {
           TrenDuk
         </div>
         <nav className="links">
-          <a href="https://github.com/HOYOUNG98">GitHub</a>
+          <a href="https://github.com/HOYOUNG98/TrenDuk">GitHub</a>
         </nav>
       </div>
     </header>
