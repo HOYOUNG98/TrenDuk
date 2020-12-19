@@ -27,7 +27,9 @@ const connectDB = async () => {
 
 app.use(bodyParser.json());
 app.use(cors());
-
+app.get("/", function (req, res) {
+  res.send("hello world");
+});
 // Created Request URLs
 app.post("/getBranches", getBranches);
 app.post("/getGibos", getGibos);
