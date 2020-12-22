@@ -3,6 +3,7 @@ import {
   StateActionType,
   SELECT_NODE,
   SELECT_COLOR,
+  UPDATE_HOVER_POINT,
 } from "./types";
 import { INode } from "../../types";
 
@@ -10,6 +11,7 @@ const initState: StateState = {
   selectedNode: null,
   selectedNodes: [],
   selectedColor: "B",
+  hoverPoint: "",
 };
 
 export const stateReducer = (
@@ -19,6 +21,7 @@ export const stateReducer = (
   let selectedNodes: Array<INode>;
   let selectedNode: INode;
   let selectedColor: "B" | "W";
+  let hoverPoint: string;
 
   switch (action.type) {
     case SELECT_NODE:
@@ -33,6 +36,10 @@ export const stateReducer = (
         selectedColor = "B";
       }
       return { ...state, selectedColor };
+
+    case UPDATE_HOVER_POINT:
+      hoverPoint = action.payload;
+      return { ...state, hoverPoint };
 
     default:
       return state;

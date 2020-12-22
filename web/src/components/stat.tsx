@@ -16,12 +16,17 @@ import { RootState } from "../cache";
 import { IGibo, INode } from "../types";
 
 export const RateStat = () => {
-  const { blackBranchNodes, whiteBranchNodes, selectedColor } = useSelector(
+  const {
+    blackBranchNodes,
+    whiteBranchNodes,
+    selectedColor,
+    hoverPoint,
+  } = useSelector(
     (state: RootState) => ({
       blackBranchNodes: state.node.blackBranchNodes,
       whiteBranchNodes: state.node.whiteBranchNodes,
-
       selectedColor: state.state.selectedColor,
+      hoverPoint: state.state.hoverPoint,
     }),
     shallowEqual
   );
@@ -82,7 +87,13 @@ export const RateStat = () => {
         <YAxis width={30} />
         {keySet.map((key, i) => {
           return (
-            <Line key={key} dataKey={key} type="monotone" stroke={colors[i]} />
+            <Line
+              key={key}
+              dataKey={key}
+              type="linear"
+              stroke={colors[i]}
+              strokeWidth={hoverPoint === key ? 3 : 1}
+            />
           );
         })}
       </LineChart>
