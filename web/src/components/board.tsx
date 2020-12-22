@@ -1,5 +1,5 @@
 // library imports
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 import { Radio } from "antd";
 
@@ -17,12 +17,14 @@ export const Board = () => {
     whiteBranchNodes,
     selectedNodes,
     selectedColor,
+    hoverPoint,
   } = useSelector(
     (state: RootState) => ({
       blackBranchNodes: state.node.blackBranchNodes,
       whiteBranchNodes: state.node.whiteBranchNodes,
       selectedNodes: state.state.selectedNodes,
       selectedColor: state.state.selectedColor,
+      hoverPoint: state.state.hoverPoint,
     }),
     shallowEqual
   );
@@ -43,7 +45,13 @@ export const Board = () => {
       ) as HTMLElement;
       boardElement.innerHTML = "";
     };
-  }, [selectedColor, selectedNodes, blackBranchNodes, whiteBranchNodes]);
+  }, [
+    selectedColor,
+    selectedNodes,
+    blackBranchNodes,
+    whiteBranchNodes,
+    hoverPoint,
+  ]);
 
   const renderBoard = () => {
     var board = new window.WGo.Board(document.getElementById("wgoboard"), {
@@ -102,6 +110,25 @@ export const Board = () => {
           dispatch({ type: "SELECT_NODE", payload: branchNodes[i] });
           dispatch({ type: "SELECT_COLOR" });
         }
+      }
+    });
+
+    board.addEventListener("mousemove", function (x: number, y: number) {
+      const move = String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
+
+      if (hoverPoint === move) return;
+
+      const selectedMoves: string[] = [];
+      const branchNodes =
+        selectedColor === "B" ? blackBranchNodes : whiteBranchNodes;
+      branchNodes.forEach((node) => {
+        selectedMoves.push(node.move);
+      });
+
+      if (!selectedMoves.includes(move)) {
+        return;
+      } else {
+        dispatch({ type: "UPDATE_HOVER_POINT", payload: move });
       }
     });
   };
