@@ -29,11 +29,6 @@ export const Board = () => {
 
   const dispatch = useDispatch();
 
-  // Wait for API request - API request when render
-  useEffect(() => {
-    getBranches();
-  }, []);
-
   // Rendering board
   useEffect(() => {
     renderBoard();
