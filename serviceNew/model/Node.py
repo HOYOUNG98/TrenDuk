@@ -1,10 +1,11 @@
 from mongoengine import *
 
+
 class Node(Document):
     root = BooleanField(default=False)
-    parent = ReferenceField()
-    children = ListField(ReferenceField(), default=[])
+    parent = ObjectIdField()
+    children = ListField(ObjectIdField(), default=[])
     move = StringField(default="")
     color = StringField(default="")
-    games = ListField(ReferenceField(), default=[])
+    games = ListField(ObjectIdField(), default=[])
     yearPickCount = DictField()

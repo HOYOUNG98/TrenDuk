@@ -65,6 +65,7 @@ class Scraper:
         record = False
         info = []
         partial_info = ""
+        print(soup)
         for character in soup:
             if character == ";":
                 break
