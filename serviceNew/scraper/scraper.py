@@ -20,7 +20,7 @@ def getURL(url_no, page_no):
 # TODO: duplicate data found?
 def scrapeLinksPage(pageOptions=(1, 1), rolling=False):
 
-    url = getURL(pageOptions[0], pageOptions[0])
+    url = getURL(pageOptions[0], pageOptions[1])
     page = requests.get(url)
     pageContent = bs4.BeautifulSoup(page.content.decode(
         'euc-kr', 'replace'), "html.parser")
@@ -47,6 +47,12 @@ def scrapeGamePage(link):
     soup = bs4.BeautifulSoup(
         linkRequest.content.decode("euc-kr", "replace"), "html.parser").prettify()
 
+    # Ad hoc of checking if value(sgf data) is successfully received
+    # In some cases, the cyberoro server has not succesfully fetched the game from server
+    if soup[0] != "(":
+        print("INVALID DATA RECEIVED:", soup)
+        return None
+
     finalData = []
 
     record = False
@@ -72,10 +78,16 @@ def scrapeGamePage(link):
 
     moves = []
     rawMoves = soup[soup.find(";")+1:]
+
     for move in rawMoves.split(";"):
         moves.append((move[0], move[2:4]))
 
     finalData.append(moves)
     finalData.append(link)
+
+    # Check if finalData is not fulfilled
+    if len(finalData) != 15:
+        print("NOT ENOUGH DATA:", finalData)
+        return None
 
     return finalData
