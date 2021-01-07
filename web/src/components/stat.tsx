@@ -82,7 +82,7 @@ export const RateStat = () => {
   return (
     <ResponsiveContainer width="100%" height={250}>
       <LineChart data={graphData}>
-        <Tooltip viewBox={{ x: 0, y: 0, width: 10, height: 400 }} />
+        <Tooltip wrapperStyle={{ width: 100 }} />
         <XAxis dataKey="year" />
         <YAxis width={30} />
         {keySet.map((key, i) => {
