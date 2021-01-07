@@ -12,6 +12,9 @@ if __name__ == "__main__":
 
     db = connect('GiboDB', host=DB_URL)
 
-    # scrapeAndSave()
+    db.copyDatabase("test", "production")
 
-    analyzeGames()
+    Node
+
+    # scrapeAndSave()
+    # analyzeGames()

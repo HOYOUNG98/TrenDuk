@@ -15,6 +15,9 @@ def assortCorners(moves):
         x = moves[i][1][0]
         y = moves[i][1][1]
 
+        if x not in REFLECT_OBJECT.keys() or y not in REFLECT_OBJECT.keys():
+            return None
+
         if x <= "j" and y <= "j" and len(topLeft) < 8:
             topLeft.append((moves[i][0], REFLECT_OBJECT[x] + y))
         if x >= "j" and y >= "j" and len(bottomRight) < 8:
