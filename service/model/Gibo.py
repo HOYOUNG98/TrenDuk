@@ -1,5 +1,4 @@
 from mongoengine import *
-
 import datetime
 
 
@@ -20,13 +19,3 @@ class Gibo(Document):
     giboLink = StringField(required=True)
     published = DateTimeField(default=datetime.datetime.now)
     analyzed = BooleanField(default=False)
-
-
-class Node(Document):
-    root = BooleanField(default=False)
-    parentID = ObjectIdField()
-    childrenID = ListField(ObjectIdField(), default=[])
-    move = StringField(default="")
-    color = StringField(default="")
-    games = ListField(ObjectIdField(), default=[])
-    yearPickCount = DictField()
