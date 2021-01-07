@@ -1,3 +1,10 @@
 venv
 constant.py
 .vscode
+
+__pycache__
+*/__pycache__
+
+.eslintcache
+
+.DS_Store

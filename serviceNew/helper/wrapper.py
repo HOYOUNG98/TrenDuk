@@ -56,18 +56,23 @@ def scrapeAndSave():
                 len(documentList), page))
 
 
-def analyzeGames():
-    root = Node(root=True)
-    root.save()
-
-    allGames = Gibo.objects()
-
+def processorJob(gibo):
+    connect('GiboDB', host=DB_URL)
     root = Node.objects(root=True).first()
-    counter = 1
-    for gibo in allGames:
-        corners = assortCorners(gibo.giboMoves)
-        for corner in corners:
-            updateTree(corner, root, gibo)
 
-        print("Completed Analysis for {}/{} games".format(counter, len(allGames)))
-        counter += 1
+    corners = assortCorners(gibo.giboMoves)
+    if corners == None:
+        return
+    for corner in corners:
+        updateTree(corner, root, gibo)
+        gibo.analyzed = True
+        gibo.save()
+
+
+def analyzeGames():
+
+    remainingGames = Gibo.objects(analyzed=False)[0:100]
+
+    pool = Pool()
+    result = pool.map(processorJob, remainingGames)
+    pool.close()
