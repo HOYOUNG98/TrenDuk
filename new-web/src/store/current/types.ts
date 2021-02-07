@@ -1,6 +1,6 @@
 import { INode } from "../../types";
 
-export interface StateState {
+export interface CurrentState {
   selectedNode: INode | null;
   selectedNodes: Array<INode>;
   selectedColor: "B" | "W";
@@ -25,7 +25,7 @@ interface updateHoverPoint {
   payload: string;
 }
 
-export type StateActionType =
+export type CurrentActionType =
   | selectNodeAction
   | selectColorAction
   | updateHoverPoint;
