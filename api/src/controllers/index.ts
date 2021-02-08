@@ -79,6 +79,7 @@ export const getBranchPoints = async (req: Request, res: Response) => {
         _id: node._id,
         x: node.move[0].charCodeAt(0) - 97,
         y: node.move[1].charCodeAt(0) - 97,
+        color: "B",
       };
     });
 
@@ -87,6 +88,7 @@ export const getBranchPoints = async (req: Request, res: Response) => {
         _id: node._id,
         x: node.move[0].charCodeAt(0) - 97,
         y: node.move[1].charCodeAt(0) - 97,
+        color: "W",
       };
     });
   } catch (error) {
