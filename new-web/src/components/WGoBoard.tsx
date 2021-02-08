@@ -10,9 +10,10 @@ import { RootState } from "../store";
 declare const window: any;
 
 export const WGoBoard: React.FC = () => {
-  const [{ data, loading, error }, refetch] = useAxios(
-    "http://localhost:4000/getBranches"
-  );
+  const [{ data, loading, error }, refetch] = useAxios({
+    url: "http://localhost:8080/getBranchPoints",
+    method: "POST",
+  });
 
   const { selectedColor, hoverPoint } = useSelector(
     (state: RootState) => ({
@@ -27,8 +28,10 @@ export const WGoBoard: React.FC = () => {
   const [selectedNodes, updateSelectedNodes] = useState([]);
 
   const refBoard = React.useRef<HTMLDivElement>(null);
-
   useEffect(() => {
+    if (!data) {
+      return;
+    }
     if (refBoard && refBoard.current) {
       var board = new window.WGo.Board(refBoard.current, {
         width: 500,
@@ -43,19 +46,19 @@ export const WGoBoard: React.FC = () => {
 
     const branchNodes = selectedColor === "B" ? data.black : data.white;
 
-    branchNodes.forEach((node) => {
+    branchNodes.forEach((node, i) => {
       board.addObject({
         x: node.x,
         y: node.y,
         type: "LB",
-        text: node.move,
+        text: i + 1,
       });
     });
 
     selectedNodes.forEach((node) => {
       board.addObject({
-        x: node.move[0].charCodeAt(0) - 97,
-        y: node.move[1].charCodeAt(0) - 97,
+        x: node.x,
+        y: node.y,
         c: node.color === "B" ? window.WGo.B : window.WGo.W,
       });
     });
@@ -63,18 +66,22 @@ export const WGoBoard: React.FC = () => {
     board.addEventListener("click", function (x: number, y: number) {
       const branchNodes = selectedColor === "B" ? data.black : data.white;
 
-      for (var i = 0; i < branchNodes.length; i++) {
-        if (
-          branchNodes[i].move[0].charCodeAt(0) - 97 === x &&
-          branchNodes[i].move[1].charCodeAt(0) - 97 === y
-        ) {
+      branchNodes.forEach((node) => {
+        if (x === node.x && y === node.y) {
           refetch();
-          updateSelectedNodes([...selectedNodes, branchNodes[i]]);
+          updateSelectedNodes([...selectedNodes, node]);
           dispatch({ type: "SELECT_COLOR" });
         }
-      }
+      });
     });
-  }, [refBoard, data, selectedNodes]);
+
+    return () => {
+      let boardElement: HTMLElement = document.getElementById(
+        "wgoboard"
+      ) as HTMLElement;
+      boardElement.innerHTML = "";
+    };
+  }, [data]);
   return <Board ref={refBoard} />;
 };
 
@@ -83,5 +90,5 @@ interface BoardProps {
 }
 
 const Board: React.FC<BoardProps> = forwardRef((prop, ref) => {
-  return <div ref={ref}></div>;
+  return <div ref={ref} id="wgoboard"></div>;
 });
