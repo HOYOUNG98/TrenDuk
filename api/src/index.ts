@@ -6,7 +6,7 @@ import dotenv from "dotenv";
 import bodyParser from "body-parser";
 
 // import local files
-import { getBranches, getGibos } from "./controllers";
+import { getBranches, getBranchPoints, getGibos } from "./controllers";
 
 const app = express();
 
@@ -33,6 +33,7 @@ app.get("/", function (req, res) {
 // Created Request URLs
 app.post("/getBranches", getBranches);
 app.post("/getGibos", getGibos);
+app.post("/getBranchPoints", getBranchPoints);
 
 // We don't start server unless DB connection is established
 const executeServer = async () => {

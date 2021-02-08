@@ -14,17 +14,8 @@ export const WGoBoard: React.FC = () => {
     "http://localhost:4000/getBranches"
   );
 
-  const {
-    blackBranchNodes,
-    whiteBranchNodes,
-    selectedNodes,
-    selectedColor,
-    hoverPoint,
-  } = useSelector(
+  const { selectedColor, hoverPoint } = useSelector(
     (state: RootState) => ({
-      blackBranchNodes: state.node.blackBranchNodes,
-      whiteBranchNodes: state.node.whiteBranchNodes,
-      selectedNodes: state.current.selectedNodes,
       selectedColor: state.current.selectedColor,
       hoverPoint: state.current.hoverPoint,
     }),
@@ -32,6 +23,8 @@ export const WGoBoard: React.FC = () => {
   );
 
   const dispatch = useDispatch();
+
+  const [selectedNodes, updateSelectedNodes] = useState([]);
 
   const refBoard = React.useRef<HTMLDivElement>(null);
 
@@ -48,13 +41,12 @@ export const WGoBoard: React.FC = () => {
       });
     }
 
-    const branchNodes: INode[] =
-      selectedColor === "B" ? blackBranchNodes : whiteBranchNodes;
+    const branchNodes = selectedColor === "B" ? data.black : data.white;
 
     branchNodes.forEach((node) => {
       board.addObject({
-        x: node.move[0].charCodeAt(0) - 97,
-        y: node.move[1].charCodeAt(0) - 97,
+        x: node.x,
+        y: node.y,
         type: "LB",
         text: node.move,
       });
@@ -69,8 +61,7 @@ export const WGoBoard: React.FC = () => {
     });
 
     board.addEventListener("click", function (x: number, y: number) {
-      const branchNodes =
-        selectedColor === "B" ? blackBranchNodes : whiteBranchNodes;
+      const branchNodes = selectedColor === "B" ? data.black : data.white;
 
       for (var i = 0; i < branchNodes.length; i++) {
         if (
@@ -78,31 +69,12 @@ export const WGoBoard: React.FC = () => {
           branchNodes[i].move[1].charCodeAt(0) - 97 === y
         ) {
           refetch();
-          dispatch({ type: "SELECT_NODE", payload: branchNodes[i] });
+          updateSelectedNodes([...selectedNodes, branchNodes[i]]);
           dispatch({ type: "SELECT_COLOR" });
         }
       }
     });
-
-    board.addEventListener("mousemove", function (x: number, y: number) {
-      const move = String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
-
-      if (hoverPoint === move) return;
-
-      const selectedMoves: string[] = [];
-      const branchNodes =
-        selectedColor === "B" ? blackBranchNodes : whiteBranchNodes;
-      branchNodes.forEach((node) => {
-        selectedMoves.push(node.move);
-      });
-
-      if (!selectedMoves.includes(move)) {
-        return;
-      } else {
-        dispatch({ type: "UPDATE_HOVER_POINT", payload: move });
-      }
-    });
-  }, [refBoard, data]);
+  }, [refBoard, data, selectedNodes]);
   return <Board ref={refBoard} />;
 };
 
