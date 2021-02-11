@@ -1,31 +1,48 @@
 import {
-  GET_BLACK_BRANCH_NODES,
-  GET_WHITE_BRANCH_NODES,
+  GET_BRANCH_POINTS,
+  GET_BRANCH_STATS,
   NodeActionType,
   NodeState,
 } from "./types";
 import { INode } from "../../types";
 
 const initState: NodeState = {
-  blackBranchNodes: [],
-  whiteBranchNodes: [],
+  branchPoints: { black: [], white: [] },
+  branchStats: { black: [], white: [] },
 };
 
 export const nodeReducer = (
   state = initState,
   action: NodeActionType
 ): NodeState => {
-  let blackBranchNodes: Array<INode>;
-  let whiteBranchNodes: Array<INode>;
-
   switch (action.type) {
-    case GET_BLACK_BRANCH_NODES:
-      blackBranchNodes = action.payload;
-      return { ...state, blackBranchNodes };
+    case GET_BRANCH_POINTS:
+      var rawNodes: Array<INode> = action.payload;
+      const black = rawNodes
+        .filter((node) => node.color === "B")
+        .map((node) => {
+          return {
+            id: node._id,
+            x: node.move[0].charCodeAt(0) - 97,
+            y: node.move[1].charCodeAt(0) - 97,
+            color: node.color,
+          };
+        });
 
-    case GET_WHITE_BRANCH_NODES:
-      whiteBranchNodes = action.payload;
-      return { ...state, whiteBranchNodes };
+      const white = rawNodes
+        .filter((node) => node.color === "W")
+        .map((node) => {
+          return {
+            id: node._id,
+            x: node.move[0].charCodeAt(0) - 97,
+            y: node.move[1].charCodeAt(0) - 97,
+            color: node.color,
+          };
+        });
+      return { ...state, branchPoints: { black, white } };
+
+    case GET_BRANCH_STATS:
+      return { ...state };
 
     default:
       return state;
