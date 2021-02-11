@@ -4,19 +4,25 @@ import React, { Ref, forwardRef, useEffect, useState } from "react";
 import { useSelector, shallowEqual, useDispatch } from "react-redux";
 
 // local imports
-import { INode } from "../types";
 import { RootState } from "../store";
+import { getBranches } from "../api/getBranches";
+import { getGibos } from "../api/getGibos";
+
+interface INode {
+  id: string;
+  x: number;
+  y: number;
+  color: "B" | "W";
+}
 
 declare const window: any;
 
 export const WGoBoard: React.FC = () => {
-  const [{ data, loading, error }, refetch] = useAxios({
-    url: "http://localhost:8080/getBranchPoints",
-    method: "POST",
-  });
+  const [selectedNodes, updateSelectedNodes] = useState<INode[]>([]);
 
-  const { selectedColor, hoverPoint } = useSelector(
+  const { branchPoints, selectedColor, hoverPoint } = useSelector(
     (state: RootState) => ({
+      branchPoints: state.node.branchPoints,
       selectedColor: state.current.selectedColor,
       hoverPoint: state.current.hoverPoint,
     }),
@@ -25,13 +31,14 @@ export const WGoBoard: React.FC = () => {
 
   const dispatch = useDispatch();
 
-  const [selectedNodes, updateSelectedNodes] = useState([]);
-
   const refBoard = React.useRef<HTMLDivElement>(null);
+
+  // Wait for API request - API request when render
   useEffect(() => {
-    if (!data) {
-      return;
-    }
+    getBranches();
+  }, []);
+
+  useEffect(() => {
     if (refBoard && refBoard.current) {
       var board = new window.WGo.Board(refBoard.current, {
         width: 500,
@@ -44,7 +51,8 @@ export const WGoBoard: React.FC = () => {
       });
     }
 
-    const branchNodes = selectedColor === "B" ? data.black : data.white;
+    const branchNodes: INode[] =
+      selectedColor === "B" ? branchPoints.black : branchPoints.white;
 
     branchNodes.forEach((node, i) => {
       board.addObject({
@@ -64,11 +72,12 @@ export const WGoBoard: React.FC = () => {
     });
 
     board.addEventListener("click", function (x: number, y: number) {
-      const branchNodes = selectedColor === "B" ? data.black : data.white;
+      const branchNodes: INode[] =
+        selectedColor === "B" ? branchPoints.black : branchPoints.white;
 
       branchNodes.forEach((node) => {
         if (x === node.x && y === node.y) {
-          refetch();
+          getBranches(node.id);
           updateSelectedNodes([...selectedNodes, node]);
           dispatch({ type: "SELECT_COLOR" });
         }
@@ -81,14 +90,12 @@ export const WGoBoard: React.FC = () => {
       ) as HTMLElement;
       boardElement.innerHTML = "";
     };
-  }, [data]);
+  }, [branchPoints]);
   return <Board ref={refBoard} />;
 };
 
-interface BoardProps {
-  ref: Ref<HTMLDivElement>;
-}
-
-const Board: React.FC<BoardProps> = forwardRef((prop, ref) => {
-  return <div ref={ref} id="wgoboard"></div>;
-});
+const Board: React.FC<{ ref: Ref<HTMLDivElement> }> = forwardRef(
+  (prop, ref) => {
+    return <div ref={ref} id="wgoboard"></div>;
+  }
+);

@@ -1,23 +1,21 @@
 import { INode } from "../../types";
 
 export interface NodeState {
-  blackBranchNodes: Array<INode>;
-  whiteBranchNodes: Array<INode>;
+  branchPoints: { black: Array<Object>; white: Array<Object> };
+  branchStats: { black: Array<Object>; white: Array<Object> };
 }
 
-export const GET_BLACK_BRANCH_NODES = "GET_BLACK_BRANCH_NODES";
-export const GET_WHITE_BRANCH_NODES = "GET_WHITE_BRANCH_NODES";
+export const GET_BRANCH_POINTS = "GET_BRANCH_POINTS";
+export const GET_BRANCH_STATS = "GET_BRANCH_STATS";
 
-interface getBlackBranchNodesAction {
-  type: typeof GET_BLACK_BRANCH_NODES;
+interface getBranchPoints {
+  type: typeof GET_BRANCH_POINTS;
   payload: Array<INode>;
 }
 
-interface getWhiteBranchNodesAction {
-  type: typeof GET_WHITE_BRANCH_NODES;
+interface getBranchStats {
+  type: typeof GET_BRANCH_STATS;
   payload: Array<INode>;
 }
 
-export type NodeActionType =
-  | getBlackBranchNodesAction
-  | getWhiteBranchNodesAction;
+export type NodeActionType = getBranchPoints | getBranchStats;
