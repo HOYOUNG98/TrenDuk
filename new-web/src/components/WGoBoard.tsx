@@ -20,14 +20,16 @@ declare const window: any;
 export const WGoBoard: React.FC = () => {
   const [selectedNodes, updateSelectedNodes] = useState<INode[]>([]);
 
-  const { branchPoints, selectedColor, hoverPoint } = useSelector(
+  const { branchPoints, selectedColor, hoverPoint, branchStats } = useSelector(
     (state: RootState) => ({
       branchPoints: state.node.branchPoints,
       selectedColor: state.current.selectedColor,
       hoverPoint: state.current.hoverPoint,
+      branchStats: state.node.branchStats,
     }),
     shallowEqual
   );
+  console.log(branchStats);
 
   const dispatch = useDispatch();
 

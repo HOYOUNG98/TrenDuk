@@ -1,1 +1,6 @@
 .env
+
+analyzer
+scraper
+go.mod
+go.sum

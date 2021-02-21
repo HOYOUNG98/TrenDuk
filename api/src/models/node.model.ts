@@ -7,8 +7,15 @@ const NodeSchema = new Schema({
   move: String,
   color: String,
   games: [{ type: Schema.Types.ObjectId, ref: "Gibo" }],
-  yearPickCount: { type: Map, of: Number },
+  yearlyStat: [{ type: Object }],
 });
+
+interface YearlyStat {
+  year: string;
+  count: number;
+  win?: number;
+  lose?: number;
+}
 
 interface Node {
   root: Boolean;
@@ -17,7 +24,7 @@ interface Node {
   move: string;
   color: string;
   games: [Types.ObjectId];
-  yearPickCount: Map<string, number>;
+  yearlyStat: [YearlyStat];
 }
 
 NodeSchema.virtual("gamesCount").get(function (this: Node) {
@@ -33,9 +40,8 @@ export interface NodeDocument extends Node, Document {
 // Project only parentID, move, color, yearPickCount
 NodeSchema.statics.getBlackChildrenNodes = async function (id: Types.ObjectId) {
   return this.aggregate([
-    { $project: { _id: 1, parent: 1, move: 1, color: 1, yearPickCount: 1 } },
     { $match: { parent: id, color: "B" } },
-    { $sort: { gamesCount: -1 } },
+    { $sort: { count: -1 } },
     { $limit: 4 },
   ]).exec();
 };
@@ -45,9 +51,8 @@ NodeSchema.statics.getBlackChildrenNodes = async function (id: Types.ObjectId) {
 // Project only parentID, move, color, yearPickCount
 NodeSchema.statics.getWhiteChildrenNodes = async function (id: Types.ObjectId) {
   return this.aggregate([
-    { $project: { _id: 1, parent: 1, move: 1, color: 1, yearPickCount: 1 } },
     { $match: { parent: id, color: "W" } },
-    { $sort: { gamesCount: -1 } },
+    { $sort: { count: -1 } },
     { $limit: 4 },
   ]).exec();
 };
