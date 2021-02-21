@@ -6,7 +6,7 @@ export const getBranchPoints = (nodes: Array<INode>) => ({
   payload: nodes,
 });
 
-export const getWhiteBranchNodes = (nodes: Array<INode>) => ({
+export const getBranchStats = (nodes: Array<INode>) => ({
   type: GET_BRANCH_STATS,
   payload: nodes,
 });

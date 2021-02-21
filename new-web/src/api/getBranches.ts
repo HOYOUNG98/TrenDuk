@@ -18,6 +18,11 @@ export function getBranches(nodeID: string | null = null) {
         type: "GET_BRANCH_POINTS",
         payload: responseData,
       });
+
+      store.dispatch({
+        type: "GET_BRANCH_STATS",
+        payload: responseData,
+      });
     })
     .catch((error: AxiosError) => {
       console.error("Error connecting to API", error);

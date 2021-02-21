@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"io/ioutil"
 	"log"
+	"os"
 	"strings"
 	"time"
 
@@ -12,6 +13,7 @@ import (
 
 	iconv "github.com/djimenez/iconv-go"
 	"github.com/gocolly/colly"
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -50,6 +52,8 @@ type Gibo struct {
 }
 
 func main() {
+
+	godotenv.Load(".env")
 	start := time.Now()
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()

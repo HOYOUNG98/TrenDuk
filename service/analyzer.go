@@ -4,9 +4,11 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"os"
 	"strings"
 	"time"
 
+	"github.com/joho/godotenv"
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -61,6 +63,7 @@ type Node struct {
 	Children   []primitive.ObjectID `bson:"children,omitempty"`
 	Parent     primitive.ObjectID   `bson:"parent,omitempty"`
 	Games      []primitive.ObjectID `bson:"games,omitempty"`
+	Count      int                  `bson:"count,omitempty"`
 	YearlyStat []YearlyStat         `bson:"yearlyStat,omitempty"`
 }
 
@@ -71,14 +74,16 @@ type CustomNode struct {
 	Color      string
 	Root       bool
 	Games      []primitive.ObjectID
+	Count      int
 	YearlyStat []YearlyStat
 }
 
 func main() {
+
+	godotenv.Load(".env")
 	start := time.Now()
 	root := CustomNode{Root: true}
 	cursor := queryMoves()
-	i := 0
 	for cursor.Next(context.Background()) {
 		var gibo Gibo
 		if err := cursor.Decode(&gibo); err != nil {
@@ -96,7 +101,6 @@ func main() {
 		buildTree(&root, bottomLeft, gibo)
 		buildTree(&root, bottomRight, gibo)
 
-		i++
 	}
 
 	fmt.Println("FINISH TREE CREATION")
@@ -155,30 +159,41 @@ func assortCorners(moves []Move) ([8]Move, [8]Move, [8]Move, [8]Move) {
 
 	}
 
-	for _, moveArray := range [4][8]Move{topLeft, topRight, bottomLeft, bottomRight} {
+	moveMatrix := [4][8]Move{topLeft, topRight, bottomLeft, bottomRight}
+
+	for i, moveArray := range moveMatrix {
 		reflected := false
-		for i, move := range moveArray {
+		for j, move := range moveArray {
+
 			if move == (Move{}) {
 				continue
 			}
 
 			x := string(move.Move[0])
 			y := string(move.Move[1])
-			if i%2 == 0 && !reflected && reflect(x) < y {
+			if j == 0 && !reflected && reflect(x) < y {
 				reflected = true
 			}
 
-			if i%2 == 1 && !reflected && reflect(x) > y {
+			if j == 1 && !reflected && reflect(x) > y {
+				reflected = true
+			}
+
+			if j == 2 && !reflected && reflect(x) < y {
 				reflected = true
 			}
 
 			if reflected {
-				move.Move = reflect(y) + reflect(x)
+				moveArray[j] = Move{
+					Color: move.Color,
+					Move:  reflect(y) + reflect(x),
+				}
 			}
 		}
+		moveMatrix[i] = moveArray
 	}
 
-	return topLeft, topRight, bottomLeft, bottomRight
+	return moveMatrix[0], moveMatrix[1], moveMatrix[2], moveMatrix[3]
 }
 
 func buildTree(root *CustomNode, moves [8]Move, gibo Gibo) {
@@ -216,6 +231,7 @@ func buildTree(root *CustomNode, moves [8]Move, gibo Gibo) {
 				Color:      move.Color,
 				Games:      GamesArray,
 				YearlyStat: yearlyStatArray,
+				Count:      1,
 			}
 			// Append yealy
 			currentNode.Children = append(currentNode.Children, &tmpNode)
@@ -232,6 +248,7 @@ func buildTree(root *CustomNode, moves [8]Move, gibo Gibo) {
 					matchingChild.YearlyStat[i] = tmpYearlyStat
 				}
 			}
+			currentNode.Count++
 			currentNode = matchingChild
 
 		}
@@ -245,18 +262,30 @@ func traverse(node *CustomNode, parentID primitive.ObjectID, assignedID primitiv
 	var returnValue []interface{}
 	for i, child := range node.Children {
 		childrenID[i] = primitive.NewObjectID()
-		output := traverse(child, parentID, childrenID[i])
+		output := traverse(child, assignedID, childrenID[i])
 		returnValue = append(returnValue, output...)
 	}
-	tmpNode := Node{
-		ID:         assignedID,
-		Color:      node.Color,
-		Move:       node.Move,
-		Root:       node.Root,
-		Parent:     parentID,
-		Children:   childrenID,
-		YearlyStat: node.YearlyStat,
+
+	var tmpNode Node
+	if node.Root {
+		tmpNode = Node{
+			ID:       assignedID,
+			Root:     true,
+			Children: childrenID,
+		}
+	} else {
+		tmpNode = Node{
+			ID:         assignedID,
+			Color:      node.Color,
+			Move:       node.Move,
+			Root:       node.Root,
+			Parent:     parentID,
+			Children:   childrenID,
+			YearlyStat: node.YearlyStat,
+			Count:      node.Count,
+		}
 	}
+
 	returnValue = append(returnValue, tmpNode)
 	return returnValue
 

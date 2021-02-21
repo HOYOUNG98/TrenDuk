@@ -5,6 +5,7 @@ import {
   NodeState,
 } from "./types";
 import { INode } from "../../types";
+import { color } from "@chakra-ui/react";
 
 const initState: NodeState = {
   branchPoints: { black: [], white: [] },
@@ -18,7 +19,7 @@ export const nodeReducer = (
   switch (action.type) {
     case GET_BRANCH_POINTS:
       var rawNodes: Array<INode> = action.payload;
-      const black = rawNodes
+      const blackMoves = rawNodes
         .filter((node) => node.color === "B")
         .map((node) => {
           return {
@@ -29,7 +30,7 @@ export const nodeReducer = (
           };
         });
 
-      const white = rawNodes
+      const whiteMoves = rawNodes
         .filter((node) => node.color === "W")
         .map((node) => {
           return {
@@ -39,11 +40,38 @@ export const nodeReducer = (
             color: node.color,
           };
         });
-      console.log(action.payload);
-      return { ...state, branchPoints: { black, white } };
+
+      return {
+        ...state,
+        branchPoints: { black: blackMoves, white: whiteMoves },
+      };
 
     case GET_BRANCH_STATS:
-      return { ...state, branchStats: { black, white } };
+      var rawNodes: Array<INode> = action.payload;
+      const blackStats = rawNodes
+        .filter((node) => node.color === "B")
+        .map((node) => {
+          return {
+            id: node._id,
+            color: node.color,
+            yearlyStat: node.yearlyStat,
+          };
+        });
+
+      const whiteStats = rawNodes
+        .filter((node) => node.color === "W")
+        .map((node) => {
+          return {
+            id: node._id,
+            color: node.color,
+            yearlyStat: node.yearlyStat,
+          };
+        });
+
+      return {
+        ...state,
+        branchStats: { black: blackStats, white: whiteStats },
+      };
 
     default:
       return state;
