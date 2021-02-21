@@ -39,10 +39,11 @@ export const nodeReducer = (
             color: node.color,
           };
         });
+      console.log(action.payload);
       return { ...state, branchPoints: { black, white } };
 
     case GET_BRANCH_STATS:
-      return { ...state };
+      return { ...state, branchStats: { black, white } };
 
     default:
       return state;
