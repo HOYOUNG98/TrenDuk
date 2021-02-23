@@ -1,6 +1,6 @@
 // library imports
 import React from "react";
-import { useSelector } from "react-redux";
+import { useSelector, useDispatch } from "react-redux";
 
 // local imports
 import { WGoBoard } from "../components/WGoBoard";
@@ -11,7 +11,7 @@ import {
   winRateConversion,
 } from "../helpers/rechartConversion";
 import { NavBar } from "../components/NavBar";
-import { HStack, Wrap } from "@chakra-ui/react";
+import { Box, HStack, Radio, RadioGroup, Wrap } from "@chakra-ui/react";
 
 const Index: React.FC = () => {
   const { branchStats, hoverPoint, selectedColor } = useSelector(
@@ -22,12 +22,28 @@ const Index: React.FC = () => {
     })
   );
 
+  const dispatch = useDispatch();
   return (
     <>
       <NavBar />
       <HStack margin={5} spacing="20px">
         <Wrap>
           <WGoBoard />
+          <RadioGroup
+            value={selectedColor === "B" ? "1" : "2"}
+            onChange={() => {
+              dispatch({ type: "SELECT_COLOR" });
+            }}
+          >
+            <HStack spacing={5}>
+              <Radio colorScheme="black" value="1">
+                흑
+              </Radio>
+              <Radio colorScheme="white" value="2">
+                백
+              </Radio>
+            </HStack>
+          </RadioGroup>
         </Wrap>
         <Wrap marginRight="20px">
           <Chart

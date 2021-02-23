@@ -2,6 +2,7 @@
 import React, { forwardRef, Ref, useEffect, useState } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { getBranches } from "../api/getBranches";
+
 // local imports
 import { RootState } from "../store";
 
@@ -78,6 +79,19 @@ export const WGoBoard: React.FC = () => {
           getBranches(node.id);
           updateSelectedNodes([...selectedNodes, node]);
           dispatch({ type: "SELECT_COLOR" });
+          dispatch({ type: "UPDATE_HOVER_POINT", payload: -1 });
+        }
+      });
+    });
+
+    board.addEventListener("mousemove", function (x: number, y: number) {
+      const branchNodes: INode[] =
+        selectedColor === "B" ? branchPoints.black : branchPoints.white;
+
+      branchNodes.forEach((branch, i) => {
+        if (branch.x === x && branch.y === y) {
+          dispatch({ type: "UPDATE_HOVER_POINT", payload: i + 1 });
+          return;
         }
       });
     });
@@ -88,7 +102,7 @@ export const WGoBoard: React.FC = () => {
       ) as HTMLElement;
       boardElement.innerHTML = "";
     };
-  }, [branchPoints]);
+  }, [branchPoints, selectedColor]);
   return <Board ref={refBoard} />;
 };
 
