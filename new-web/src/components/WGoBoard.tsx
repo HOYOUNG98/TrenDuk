@@ -1,12 +1,9 @@
 // library imports
-import useAxios from "axios-hooks";
-import React, { Ref, forwardRef, useEffect, useState } from "react";
-import { useSelector, shallowEqual, useDispatch } from "react-redux";
-
+import React, { forwardRef, Ref, useEffect, useState } from "react";
+import { shallowEqual, useDispatch, useSelector } from "react-redux";
+import { getBranches } from "../api/getBranches";
 // local imports
 import { RootState } from "../store";
-import { getBranches } from "../api/getBranches";
-import { getGibos } from "../api/getGibos";
 
 interface INode {
   id: string;
@@ -29,7 +26,6 @@ export const WGoBoard: React.FC = () => {
     }),
     shallowEqual
   );
-  console.log(branchStats);
 
   const dispatch = useDispatch();
 

@@ -237,6 +237,7 @@ func buildTree(root *CustomNode, moves [8]Move, gibo Gibo) {
 			currentNode.Children = append(currentNode.Children, &tmpNode)
 			currentNode = &tmpNode
 		} else {
+			found := false
 			for i, year := range matchingChild.YearlyStat {
 				tmpYearlyStat := YearlyStat{
 					Year:  year.Year,
@@ -246,7 +247,17 @@ func buildTree(root *CustomNode, moves [8]Move, gibo Gibo) {
 				}
 				if year.Year == gibo.Date[:4] {
 					matchingChild.YearlyStat[i] = tmpYearlyStat
+					found = true
 				}
+			}
+			if !found {
+				tmpYearlyStat := YearlyStat{
+					Year:  gibo.Date[:4],
+					Count: 1,
+					Win:   win,
+					Lose:  lose,
+				}
+				matchingChild.YearlyStat = append(matchingChild.YearlyStat, tmpYearlyStat)
 			}
 			currentNode.Count++
 			currentNode = matchingChild

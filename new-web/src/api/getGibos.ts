@@ -3,7 +3,7 @@ import axios, { AxiosResponse, AxiosError } from "axios";
 
 // import local files
 import { IGibo } from "../types";
-import { store } from "../cache";
+import { store } from "../store";
 
 // Interface of data field
 interface IResponseData {
