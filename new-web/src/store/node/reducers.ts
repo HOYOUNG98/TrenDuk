@@ -5,7 +5,6 @@ import {
   NodeState,
 } from "./types";
 import { INode } from "../../types";
-import { color } from "@chakra-ui/react";
 
 const initState: NodeState = {
   branchPoints: { black: [], white: [] },
