@@ -1,21 +1,21 @@
-interface IYearly {
-  year: string;
-  count: number;
-  win: number;
-  lose: number;
+import { INodeStats as INode } from "../store/node/types";
+
+interface IChartData {
+  [key: string]: string | number;
 }
 
-interface IStat {
-  color: string;
-  id: string;
-  yearlyStat: [IYearly];
+interface ITmpCountStore {
+  [key: string]: number;
 }
 
-export const pickRateConversion = (branchStats, selectedColor): object[] => {
-  const stats: Array<IStat> =
+export const pickRateConversion = (
+  branchStats: { black: Array<INode>; white: Array<INode> },
+  selectedColor: string
+): object[] => {
+  const stats: Array<INode> =
     selectedColor === "B" ? branchStats.black : branchStats.white;
 
-  var chartData = [
+  var chartData: Array<IChartData> = [
     { year: "2014" },
     { year: "2015" },
     { year: "2016" },
@@ -26,7 +26,7 @@ export const pickRateConversion = (branchStats, selectedColor): object[] => {
     { year: "2021" },
   ];
 
-  var countStore = {
+  var countStore: ITmpCountStore = {
     "2014": 0,
     "2015": 0,
     "2016": 0,
@@ -36,7 +36,7 @@ export const pickRateConversion = (branchStats, selectedColor): object[] => {
     "2020": 0,
     "2021": 0,
   };
-  stats.forEach((stat, i) => {
+  stats.forEach((stat) => {
     stat.yearlyStat.forEach((yearly) => {
       countStore[yearly.year] += yearly.count;
     });
@@ -57,11 +57,14 @@ export const pickRateConversion = (branchStats, selectedColor): object[] => {
   return chartData;
 };
 
-export const winRateConversion = (branchStats, selectedColor): object[] => {
-  const stats: Array<IStat> =
+export const winRateConversion = (
+  branchStats: { black: Array<INode>; white: Array<INode> },
+  selectedColor: string
+): object[] => {
+  const stats: Array<INode> =
     selectedColor === "B" ? branchStats.black : branchStats.white;
 
-  var chartData = [
+  var chartData: Array<IChartData> = [
     { year: "2014" },
     { year: "2015" },
     { year: "2016" },

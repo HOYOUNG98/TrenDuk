@@ -26,5 +26,12 @@ export interface INode {
   move: string;
   color: string;
   games?: Array<string>;
-  yearPickCount: { [key: string]: number };
+  yearlyStat: Array<YearlyStat>;
+}
+
+interface YearlyStat {
+  year: string;
+  count: number;
+  win?: number;
+  lose?: number;
 }

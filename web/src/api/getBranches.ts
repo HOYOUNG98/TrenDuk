@@ -3,30 +3,25 @@ import axios, { AxiosResponse, AxiosError } from "axios";
 
 // import local files
 import { INode } from "../types";
-import { store } from "../cache";
-
-// Interface of data field
-interface IResponseData {
-  blackChildrenNodes: Array<INode>;
-  whiteChildrenNodes: Array<INode>;
-}
+import { store } from "../store";
 
 export function getBranches(nodeID: string | null = null) {
   axios({
     method: "POST",
     url: "getBranches",
-    baseURL: process.env.REACT_APP_API_BASE_URL,
+    baseURL: process.env.NEXT_PUBLIC_API_URL,
     data: { nodeID },
   })
     .then((response: AxiosResponse) => {
-      const responseData: IResponseData = response.data.data;
+      const responseData: Array<INode> = response.data.data;
       store.dispatch({
-        type: "GET_BLACK_BRANCH_NODES",
-        payload: responseData.blackChildrenNodes,
+        type: "GET_BRANCH_POINTS",
+        payload: responseData,
       });
+
       store.dispatch({
-        type: "GET_WHITE_BRANCH_NODES",
-        payload: responseData.whiteChildrenNodes,
+        type: "GET_BRANCH_STATS",
+        payload: responseData,
       });
     })
     .catch((error: AxiosError) => {

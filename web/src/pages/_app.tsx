@@ -6,7 +6,7 @@ import { Provider } from "react-redux";
 import theme from "../theme";
 import { store } from "../store";
 
-function MyApp({ Component, pageProps }) {
+function MyApp({ Component, pageProps }: any) {
   return (
     <Provider store={store}>
       <ChakraProvider resetCSS theme={theme}>

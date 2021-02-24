@@ -11,7 +11,7 @@ import {
 
 interface ChartProps {
   chartData: object[];
-  hoverPoint: number;
+  hoverPoint: string;
   variant: string;
 }
 
@@ -47,7 +47,7 @@ export const Chart: React.FC<ChartProps> = ({
               key={i}
               type="linear"
               stroke={colors[i]}
-              strokeWidth={hoverPoint === i ? 3 : 1}
+              strokeWidth={hoverPoint === i.toString() ? 3 : 1}
             />
           );
         })}
