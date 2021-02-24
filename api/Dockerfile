@@ -12,5 +12,5 @@ RUN npm run build
 COPY .env ./dist/
 WORKDIR ./dist/
 
-EXPOSE 4000
+EXPOSE 8080
 CMD node src/index.js

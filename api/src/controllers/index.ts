@@ -46,49 +46,6 @@ export const getBranches = async (req: Request, res: Response) => {
   });
 };
 
-interface GetBranchPointsRequestData {
-  nodeID: Types.ObjectId | null;
-}
-
-export const getBranchPoints = async (req: Request, res: Response) => {
-  const data: GetBranchPointsRequestData = req.body;
-
-  console.log(data);
-
-  let black, white;
-  try {
-    const node = data.nodeID
-      ? await NodeModel.getNodeByID(data.nodeID)
-      : await NodeModel.getRootNode();
-
-    const blackBranchPoints = await NodeModel.getBlackBranchMoves(node._id);
-    const whiteBranchPoints = await NodeModel.getWhiteBranchMoves(node._id);
-
-    black = blackBranchPoints.map((node) => {
-      return {
-        _id: node._id,
-        x: node.move[0].charCodeAt(0) - 97,
-        y: node.move[1].charCodeAt(0) - 97,
-        color: "B",
-      };
-    });
-
-    white = whiteBranchPoints.map((node) => {
-      return {
-        _id: node._id,
-        x: node.move[0].charCodeAt(0) - 97,
-        y: node.move[1].charCodeAt(0) - 97,
-        color: "W",
-      };
-    });
-  } catch (error) {
-    console.log(error);
-    return res.send({ status: "500", error });
-  }
-
-  return res.send({ status: "200", black, white });
-};
-
 /*
   /getGibos request
   Receives id of a node and returns corresponding gibos
