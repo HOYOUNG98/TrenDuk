@@ -2,22 +2,29 @@ import { Document, Model, model, Schema, Types } from "mongoose";
 
 const NodeSchema = new Schema({
   root: Boolean,
-  parentID: { type: Schema.Types.ObjectId, ref: "Node" },
-  childrenID: [{ type: Schema.Types.ObjectId, ref: "Node" }],
+  parent: { type: Schema.Types.ObjectId, ref: "Node" },
+  children: [{ type: Schema.Types.ObjectId, ref: "Node" }],
   move: String,
   color: String,
   games: [{ type: Schema.Types.ObjectId, ref: "Gibo" }],
-  yearPickCount: { type: Map, of: Number },
+  yearlyStat: [{ type: Object }],
 });
+
+interface YearlyStat {
+  year: string;
+  count: number;
+  win?: number;
+  lose?: number;
+}
 
 interface Node {
   root: Boolean;
-  parentID: Types.ObjectId;
-  childrenID: [Types.ObjectId];
+  parent: Types.ObjectId;
+  children: [Types.ObjectId];
   move: string;
   color: string;
   games: [Types.ObjectId];
-  yearPickCount: Map<string, number>;
+  yearlyStat: [YearlyStat];
 }
 
 NodeSchema.virtual("gamesCount").get(function (this: Node) {
@@ -33,9 +40,8 @@ export interface NodeDocument extends Node, Document {
 // Project only parentID, move, color, yearPickCount
 NodeSchema.statics.getBlackChildrenNodes = async function (id: Types.ObjectId) {
   return this.aggregate([
-    { $project: { _id: 1, parentID: 1, move: 1, color: 1, yearPickCount: 1 } },
-    { $match: { parentID: id, color: "B" } },
-    { $sort: { gamesCount: -1 } },
+    { $match: { parent: id, color: "B" } },
+    { $sort: { count: -1 } },
     { $limit: 4 },
   ]).exec();
 };
@@ -45,9 +51,8 @@ NodeSchema.statics.getBlackChildrenNodes = async function (id: Types.ObjectId) {
 // Project only parentID, move, color, yearPickCount
 NodeSchema.statics.getWhiteChildrenNodes = async function (id: Types.ObjectId) {
   return this.aggregate([
-    { $project: { _id: 1, parentID: 1, move: 1, color: 1, yearPickCount: 1 } },
-    { $match: { parentID: id, color: "W" } },
-    { $sort: { gamesCount: -1 } },
+    { $match: { parent: id, color: "W" } },
+    { $sort: { count: -1 } },
     { $limit: 4 },
   ]).exec();
 };
@@ -63,6 +68,8 @@ NodeSchema.statics.getRootNode = async function () {
 export interface NodeModel extends Model<NodeDocument> {
   getBlackChildrenNodes(id: Types.ObjectId): Promise<[NodeDocument]>;
   getWhiteChildrenNodes(id: Types.ObjectId): Promise<[NodeDocument]>;
+  getBlackBranchMoves(id: Types.ObjectId): Promise<[NodeDocument]>;
+  getWhiteBranchMoves(id: Types.ObjectId): Promise<[NodeDocument]>;
 
   getNodeByID(id: Types.ObjectId): Promise<NodeDocument>;
   getRootNode(): Promise<NodeDocument>;
