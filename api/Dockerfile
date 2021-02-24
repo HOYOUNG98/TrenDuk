@@ -1,4 +1,4 @@
-FROM node
+FROM node:alpine
 
 WORKDIR /usr/app
 
@@ -12,5 +12,5 @@ RUN npm run build
 COPY .env ./dist/
 WORKDIR ./dist/
 
-EXPOSE 8080
+EXPOSE 4000
 CMD node src/index.js
