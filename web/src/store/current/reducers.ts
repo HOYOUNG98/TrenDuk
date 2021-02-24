@@ -1,23 +1,23 @@
 import {
-  StateState,
-  StateActionType,
+  CurrentState,
+  CurrentActionType,
   SELECT_NODE,
   SELECT_COLOR,
   UPDATE_HOVER_POINT,
 } from "./types";
 import { INode } from "../../types";
 
-const initState: StateState = {
+const initState: CurrentState = {
   selectedNode: null,
   selectedNodes: [],
   selectedColor: "B",
   hoverPoint: "",
 };
 
-export const stateReducer = (
+export const currentReducer = (
   state = initState,
-  action: StateActionType
-): StateState => {
+  action: CurrentActionType
+): CurrentState => {
   let selectedNodes: Array<INode>;
   let selectedNode: INode;
   let selectedColor: "B" | "W";

@@ -1,10 +1,6 @@
-venv
-constant.py
-.vscode
+.env
 
-__pycache__
-*/__pycache__
-
-.eslintcache
-
-.DS_Store
+analyzer
+scraper
+go.mod
+go.sum

@@ -27,6 +27,7 @@ interface GetBranchesRequestData {
 export const getBranches = async (req: Request, res: Response) => {
   const data: GetBranchesRequestData = req.body;
 
+  let nodes;
   try {
     const node = data.nodeID
       ? await NodeModel.getNodeByID(data.nodeID)
@@ -35,25 +36,14 @@ export const getBranches = async (req: Request, res: Response) => {
     const blackChildrenNodes = await NodeModel.getBlackChildrenNodes(node._id);
     const whiteChildrenNodes = await NodeModel.getWhiteChildrenNodes(node._id);
 
-    const body: ResponseBody = {
-      status: 200,
-      data: { blackChildrenNodes, whiteChildrenNodes },
-    };
-    res.status(200);
-    res.json(body);
+    nodes = [...blackChildrenNodes, ...whiteChildrenNodes];
   } catch (error) {
-    console.log(error);
-
-    const body: ResponseBody = {
-      status: 500,
-      data: null,
-      error,
-    };
-    res.status(500);
-    res.json(body);
-  } finally {
-    res.send();
+    return res.send({ status: "500", error });
   }
+  return res.send({
+    status: "200",
+    data: nodes,
+  });
 };
 
 /*
