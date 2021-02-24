@@ -1,3 +1,5 @@
+import { INode } from "../../types";
+
 export interface INodeMoves {
   id: string;
   x: number;
@@ -8,8 +10,8 @@ export interface INodeMoves {
 export interface IYearly {
   year: string;
   count: number;
-  win: number;
-  lose: number;
+  win?: number;
+  lose?: number;
 }
 
 export interface INodeStats {

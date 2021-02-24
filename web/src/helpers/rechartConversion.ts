@@ -82,13 +82,15 @@ export const winRateConversion = (
           if (year1.count == 0) {
             return;
           }
-          if (Object.keys(year1).indexOf("win") !== -1) {
+          if (year1.win !== undefined) {
             year2[i + 1] = ((year1.win / year1.count) * 100).toFixed(2);
-          } else {
+          } else if (year1.lose !== undefined) {
             year2[i + 1] = (
               ((year1.count - year1.lose) / year1.count) *
               100
             ).toFixed(2);
+          } else {
+            return;
           }
         }
       });

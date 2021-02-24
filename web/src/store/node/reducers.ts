@@ -25,7 +25,7 @@ export const nodeReducer = (
             id: node._id,
             x: node.move[0].charCodeAt(0) - 97,
             y: node.move[1].charCodeAt(0) - 97,
-            color: node.color,
+            color: node.color as "B" | "W",
           };
         });
 
@@ -36,7 +36,7 @@ export const nodeReducer = (
             id: node._id,
             x: node.move[0].charCodeAt(0) - 97,
             y: node.move[1].charCodeAt(0) - 97,
-            color: node.color,
+            color: node.color as "B" | "W",
           };
         });
 
@@ -52,7 +52,7 @@ export const nodeReducer = (
         .map((node) => {
           return {
             id: node._id,
-            color: node.color,
+            color: node.color as "B" | "W",
             yearlyStat: node.yearlyStat,
           };
         });
@@ -62,7 +62,7 @@ export const nodeReducer = (
         .map((node) => {
           return {
             id: node._id,
-            color: node.color,
+            color: node.color as "B" | "W",
             yearlyStat: node.yearlyStat,
           };
         });
