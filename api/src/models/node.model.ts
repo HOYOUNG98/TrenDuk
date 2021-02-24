@@ -57,22 +57,6 @@ NodeSchema.statics.getWhiteChildrenNodes = async function (id: Types.ObjectId) {
   ]).exec();
 };
 
-NodeSchema.statics.getBlackBranchMoves = async function (id: Types.ObjectId) {
-  return this.aggregate([
-    { $match: { parent: id, color: "B" } },
-    { $sort: { gamesCount: -1 } },
-    { $limit: 4 },
-  ]).exec();
-};
-
-NodeSchema.statics.getWhiteBranchMoves = async function (id: Types.ObjectId) {
-  return this.aggregate([
-    { $match: { parent: id, color: "W" } },
-    { $sort: { gamesCount: -1 } },
-    { $limit: 4 },
-  ]).exec();
-};
-
 NodeSchema.statics.getNodeByID = async function (id: Types.ObjectId) {
   return this.findById(id).exec();
 };
