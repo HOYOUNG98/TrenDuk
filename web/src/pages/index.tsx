@@ -11,7 +11,7 @@ import {
   winRateConversion,
 } from "../helpers/rechartConversion";
 import { NavBar } from "../components/NavBar";
-import { Box, HStack, Radio, RadioGroup, Wrap } from "@chakra-ui/react";
+import { HStack, Radio, RadioGroup, Wrap } from "@chakra-ui/react";
 
 const Index: React.FC = () => {
   const { branchStats, hoverPoint, selectedColor } = useSelector(

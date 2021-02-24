@@ -5,25 +5,17 @@ import { getBranches } from "../api/getBranches";
 
 // local imports
 import { RootState } from "../store";
-
-interface INode {
-  id: string;
-  x: number;
-  y: number;
-  color: "B" | "W";
-}
+import { INodeMoves as INode } from "../store/node/types";
 
 declare const window: any;
 
 export const WGoBoard: React.FC = () => {
   const [selectedNodes, updateSelectedNodes] = useState<INode[]>([]);
 
-  const { branchPoints, selectedColor, hoverPoint, branchStats } = useSelector(
+  const { branchPoints, selectedColor } = useSelector(
     (state: RootState) => ({
       branchPoints: state.node.branchPoints,
       selectedColor: state.current.selectedColor,
-      hoverPoint: state.current.hoverPoint,
-      branchStats: state.node.branchStats,
     }),
     shallowEqual
   );
@@ -107,7 +99,7 @@ export const WGoBoard: React.FC = () => {
 };
 
 const Board: React.FC<{ ref: Ref<HTMLDivElement> }> = forwardRef(
-  (prop, ref) => {
+  (_prop, ref) => {
     return <div ref={ref} id="wgoboard"></div>;
   }
 );
