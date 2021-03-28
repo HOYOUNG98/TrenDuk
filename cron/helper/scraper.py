@@ -44,7 +44,7 @@ def parse_links(content):
     return links, True
 
 
-def parse_game(content):
+def parse_game(content, link):
     content = content.prettify()
     end_semi_colon = content.find(";")
 
@@ -55,7 +55,8 @@ def parse_game(content):
     info = info.replace("[", ":").replace("\r\n", "")
     split_info = info.split("]")
 
-    gibo = {"Time": {}, "BlackPlayer": {}, "WhitePlayer": {}, "Moves": []}
+    gibo = {"Time": {}, "BlackPlayer": {},
+            "WhitePlayer": {}, "Moves": [], "Link": link}
     for category in split_info:
         if len(category) <= 2:
             continue
@@ -91,7 +92,7 @@ def parse_game(content):
             print("Undefined category:", category)
 
     moves = content[end_semi_colon+1:]
-    end_parenthesis = moves.index(")")
+    end_parenthesis = moves.find(")")
 
     if end_parenthesis == -1:
         return None
@@ -106,7 +107,7 @@ def parse_game(content):
         move["Move"] = split_move[1:]
         gibo["Moves"].append(move)
 
-    return None
+    return gibo
 
 
 if __name__ == "__main__":
@@ -116,4 +117,4 @@ if __name__ == "__main__":
     links = parse_links(content)
     for link in links:
         content = request(link)
-        parse_game(content)
+        gibo = parse_game(content, link)
