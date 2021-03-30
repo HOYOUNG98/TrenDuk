@@ -3,6 +3,9 @@ from bson.objectid import ObjectId
 
 RECURSION_DEPTH = 8
 
+client = MongoClient("mongodb+srv://kevin4163:ghdi4163@trenduk.sucyo.mongodb.net/trenduk?retryWrites=true&w=majority")
+gibo = client["trenduk"]["gibo"]
+
 
 def assort_corners(moves):
     top_right = []
@@ -83,15 +86,16 @@ def build_tree(root, moves, gibo):
         new_node = {
             "Root": False,
             "Parent": root,
+            "Children": [],
             "Move": move["Move"],
             "Color": move["Color"],
-            "Games": [gibo["ID"]],
+            "Games": [gibo["_id"]],
             "YearlyStat": [{"Year": gibo["Date"][:4], "Count": 1, "Win": win, "Lose": lose}],
             "Count": 1,
         }
 
+        build_tree(new_node, moves[1:], gibo)
         root["Children"].append(new_node)
-        root = build_tree(new_node, moves[1:], gibo)
     else:
         found = False
         for yearly_stat in matching_child["YearlyStat"]:
@@ -106,27 +110,27 @@ def build_tree(root, moves, gibo):
                 {"Year": gibo["Date"][:4], "Count": 1, "Win": win, "Lose": lose,}
             )
         root["Count"] += 1
-        root = build_tree(matching_child, moves[1:], gibo)
+        build_tree(matching_child, moves[1:], gibo)
 
     return root
 
 
-def tree_to_list(root, parentID, assignedID):
+def tree_to_list(root, assignedID, parentID=None):
     childrenID = []
     return_value = []
 
     for child in root["Children"]:
-        newID = ObjectId()
+        newID = hash((child["Move"], child["Color"], parentID))
         childrenID.append(newID)
-        output = tree_to_list(child, assignedID, newID)
-        return_value.append(output)
+        output = tree_to_list(child, newID, assignedID)
+        return_value = return_value + output
 
     if root["Root"]:
-        return_value.append({"ID": assignedID, "Root": True, "Children": childrenID})
+        return_value.append({"_id": assignedID, "Root": True, "Children": childrenID})
     else:
         return_value.append(
             {
-                "ID": assignedID,
+                "_id": assignedID,
                 "Root": False,
                 "Move": root["Move"],
                 "Root": root["Root"],
