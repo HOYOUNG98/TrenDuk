@@ -14,8 +14,8 @@ def assort_corners(moves):
     bottom_left = []
 
     for i in range(len(moves)):
-        x = moves[i]["Move"][0]
-        y = moves[i]["Move"][1]
+        x = moves[i]["move"][0]
+        y = moves[i]["move"][1]
 
         if (
             len(top_right) == RECURSION_DEPTH
@@ -26,13 +26,13 @@ def assort_corners(moves):
             break
 
         if x <= "j" and y <= "j" and len(top_left) < 8:
-            top_left.append({"Color": moves[i]["Color"], "Move": reflect(x) + y})
+            top_left.append({"color": moves[i]["color"], "move": reflect(x) + y})
         if x >= "j" and y >= "j" and len(bottom_right) < 8:
-            bottom_right.append({"Color": moves[i]["Color"], "Move": x + reflect(y)})
+            bottom_right.append({"color": moves[i]["color"], "move": x + reflect(y)})
         if x <= "j" and y >= "j" and len(top_right) < 8:
-            top_right.append({"Color": moves[i]["Color"], "Move": reflect(x) + reflect(y)})
+            top_right.append({"color": moves[i]["color"], "move": reflect(x) + reflect(y)})
         if x >= "j" and y <= "j" and len(bottom_left) < 8:
-            bottom_left.append({"Color": moves[i]["Color"], "Move": x + reflect(y)})
+            bottom_left.append({"color": moves[i]["color"], "move": x + reflect(y)})
 
     all_corners = [top_left, top_right, bottom_left, bottom_right]
 
@@ -45,10 +45,10 @@ def assort_corners(moves):
             if not move:
                 continue
 
-            x = move["Move"][0]
-            y = move["Move"][1]
+            x = move["move"][0]
+            y = move["move"][1]
             if reflected:
-                all_corners[i][j] = {"Color": moves[i]["Color"], "Move": reflect(y) + reflect(x)}
+                all_corners[i][j] = {"color": moves[i]["color"], "move": reflect(y) + reflect(x)}
             else:
 
                 if j == 0 and reflect(x) < y:
@@ -72,44 +72,44 @@ def build_tree(root, moves, gibo):
     win = 0
     lose = 0
 
-    if move["Color"] == check_winner(gibo["Result"]):
+    if move["color"] == check_winner(gibo["result"]):
         win += 1
     else:
         lose += 1
 
     matching_child = {}
-    for child in root["Children"]:
-        if child["Color"] == move["Color"] and child["Move"] == move["Move"]:
+    for child in root["children"]:
+        if child["color"] == move["color"] and child["move"] == move["move"]:
             matching_child = child
 
     if not matching_child:
         new_node = {
-            "Root": False,
-            "Parent": root,
-            "Children": [],
-            "Move": move["Move"],
-            "Color": move["Color"],
-            "Games": [gibo["_id"]],
-            "YearlyStat": [{"Year": gibo["Date"][:4], "Count": 1, "Win": win, "Lose": lose}],
-            "Count": 1,
+            "root": False,
+            "parent": root,
+            "children": [],
+            "move": move["move"],
+            "color": move["color"],
+            "games": [gibo["_id"]],
+            "yearlyStat": [{"year": gibo["date"][:4], "count": 1, "win": win, "lose": lose}],
+            "count": 1,
         }
 
         build_tree(new_node, moves[1:], gibo)
-        root["Children"].append(new_node)
+        root["children"].append(new_node)
     else:
         found = False
-        for yearly_stat in matching_child["YearlyStat"]:
-            if yearly_stat["Year"] == gibo["Date"][:4]:
-                yearly_stat["Count"] += 1
-                yearly_stat["Win"] += win
-                yearly_stat["Lose"] += lose
+        for yearly_stat in matching_child["yearlyStat"]:
+            if yearly_stat["year"] == gibo["date"][:4]:
+                yearly_stat["count"] += 1
+                yearly_stat["win"] += win
+                yearly_stat["lose"] += lose
                 found = True
 
         if not found:
-            matching_child["YearlyStat"].append(
-                {"Year": gibo["Date"][:4], "Count": 1, "Win": win, "Lose": lose,}
+            matching_child["yearlyStat"].append(
+                {"year": gibo["date"][:4], "count": 1, "win": win, "lose": lose,}
             )
-        root["Count"] += 1
+        root["count"] += 1
         build_tree(matching_child, moves[1:], gibo)
 
     return root
@@ -119,25 +119,25 @@ def tree_to_list(root, assignedID, parentID=None):
     childrenID = []
     return_value = []
 
-    for child in root["Children"]:
-        newID = hash((child["Move"], child["Color"], parentID))
+    for child in root["children"]:
+        newID = hash((child["move"], child["color"], parentID))
         childrenID.append(newID)
         output = tree_to_list(child, newID, assignedID)
         return_value = return_value + output
 
-    if root["Root"]:
-        return_value.append({"_id": assignedID, "Root": True, "Children": childrenID})
+    if root["root"]:
+        return_value.append({"_id": assignedID, "root": True, "children": childrenID})
     else:
         return_value.append(
             {
                 "_id": assignedID,
-                "Root": False,
-                "Move": root["Move"],
-                "Root": root["Root"],
-                "Parent": parentID,
-                "Children": childrenID,
-                "YearlyStat": root["YearlyStat"],
-                "Count": root["Count"],
+                "root": False,
+                "move": root["move"],
+                "root": root["root"],
+                "parent": parentID,
+                "children": childrenID,
+                "yearlyStat": root["yearlyStat"],
+                "count": root["count"],
             }
         )
 
