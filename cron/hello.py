@@ -1,9 +1,10 @@
 import time
 from flask import Flask
 from pymongo import MongoClient
+from pandas import DataFrame
 
 from helper.scraper import request, parse_links, parse_game
-from helper.analyzer import assort_corners, build_tree, tree_to_list
+from helper.manipulator import assort_corners, build_tree, tree_to_list
 
 app = Flask(__name__)
 client = MongoClient("mongodb+srv://kevin4163:ghdi4163@trenduk.sucyo.mongodb.net/trenduk?retryWrites=true&w=majority")
@@ -64,15 +65,18 @@ def test1():
     gibo_documents.append(gibo_document)
     gibo.insert_many(gibo_documents)
 
-    root = {"Root": True, "Children": []}
+    root = {"root": True, "children": []}
     for gibo_document in gibo_documents:
-        corners = assort_corners(gibo_document["Moves"])
+        corners = assort_corners(gibo_document["moves"])
         for moves in corners:
             root = build_tree(root, moves, gibo_document)
 
     node_list = tree_to_list(root, assignedID=hash("root_hash"))
 
-    node.insert_many(node_list)
+    df = DataFrame(node_list)
+    df = df.sort_values(by=["depth"])
+    print(df.head())
+    print(df[["depth", "move", "count", "color"]])
 
 
 @app.route("/")
