@@ -35,7 +35,7 @@ def assort_corners(moves):
     for i in range(4):
         corner = all_corners[i]
         reflected = False
-        for j in range(RECURSION_DEPTH):
+        for j in range(len(corner)):
             move = corner[j]
 
             if not move:
