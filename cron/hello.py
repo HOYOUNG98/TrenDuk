@@ -2,13 +2,15 @@ import time
 from flask import Flask
 from pymongo import MongoClient
 from pandas import DataFrame
+import os
 
 from helper.scraper import request, parse_links, parse_game
 from helper.analyzer import assort_corners, build_tree, tree_to_list
-from helper.database import fetchAllGibos, insertManyGibos, insertManyNodes
+from helper.database import fetchAllGibos, insertManyGibos, insertManyNodes, updateManyNodes
 
 app = Flask(__name__)
 
+os.environ["PYTHONHASHSEED"] = "TrendukSecret"
 
 MAX_PAGE = 465
 
@@ -50,6 +52,7 @@ def scheduled():
         node_list = tree_to_list(root, assignedID=hash("root_hash"))
 
         insertManyNodes(node_list)
+        insertManyNodes(node_list)
 
 
 @app.cli.command()
@@ -60,9 +63,9 @@ def test1():
 
     gibo_documents = []
 
-    for i in range(5):
-        content = request(links[i])
-        gibo_document = parse_game(content, links[i])
+    for link in links[:2]:
+        content = request(link)
+        gibo_document = parse_game(content, link)
 
         gibo_documents.append(gibo_document)
 
@@ -77,6 +80,11 @@ def test1():
     df = DataFrame(node_list)
     df["len"] = df["data"].str.len()
     print(df.sort_values(by=["len"], ascending=False))
+
+    insertManyGibos(gibo_documents)
+    updateManyNodes(node_list)
+    result = updateManyNodes(node_list)
+    print(result)
 
 
 @app.cli.command()
