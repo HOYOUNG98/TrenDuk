@@ -6,7 +6,7 @@ import os
 
 from helper.scraper import request, parse_links, parse_game
 from helper.analyzer import assort_corners, build_tree, tree_to_list
-from helper.database import fetchAllGibos, insertManyGibos, insertManyNodes, updateManyNodes
+from helper.database import fetchAllGibos, insertManyGibos, insertManyNodes, upsertManyNodes
 
 app = Flask(__name__)
 
@@ -82,8 +82,8 @@ def test1():
     print(df.sort_values(by=["len"], ascending=False))
 
     insertManyGibos(gibo_documents)
-    updateManyNodes(node_list)
-    result = updateManyNodes(node_list)
+    upsertManyNodes(node_list)
+    result = upsertManyNodes(node_list)
     print(result)
 
 

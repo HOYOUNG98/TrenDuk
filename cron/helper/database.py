@@ -24,7 +24,7 @@ def fetchAllNodes():
     return df
 
 
-def updateManyNodes(object_list):
+def upsertManyNodes(object_list):
     operations = []
     node_ids = [str(id) for id in node_collection.find().distinct("_id")]
     for node in object_list:
