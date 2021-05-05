@@ -22,6 +22,7 @@ def scheduled():
         links, duplicate_found = parse_links(content)
 
         if duplicate_found == False:
+            print("DUPLICATE")
             break
 
         gibo_objects = []
@@ -33,15 +34,16 @@ def scheduled():
                 continue
 
             gibo_objects.append(gibo_object)
+        print(DataFrame(gibo_objects).head())
         insertManyGibos(gibo_objects)
 
         page += 1
 
         print("Estimated: {0}/{1}".format(page, MAX_PAGE))
 
-        root = {"Root": True, "Children": []}
+        root = {"depth": 0, "children": []}
         for gibo_object in gibo_objects:
-            corners = assort_corners(gibo_object["Moves"])
+            corners = assort_corners(gibo_object["moves"])
             for moves in corners:
                 root = build_tree(root, moves, gibo_object)
 
@@ -54,28 +56,27 @@ def scheduled():
 def test1():
     link = "https://www.cyberoro.com/bcast/gibo.oro?param=1&div=1&Tdiv=B&Sdiv=2&pageNo=1&blockNo=1"
     content = request(link)
-    links = parse_links(content)
+    links, _ = parse_links(content)
 
     gibo_documents = []
-    link = links[0]
-    content = request(link)
-    gibo_document = parse_game(content, link)
 
-    gibo_documents.append(gibo_document)
-    insertManyNodes(gibo_documents)
+    for i in range(5):
+        content = request(links[i])
+        gibo_document = parse_game(content, links[i])
 
-    root = {"root": True, "children": []}
+        gibo_documents.append(gibo_document)
+
+    root = {"depth": 0, "children": []}
     for gibo_document in gibo_documents:
         corners = assort_corners(gibo_document["moves"])
         for moves in corners:
             root = build_tree(root, moves, gibo_document)
 
-    node_list = tree_to_list(root, assignedID=hash("root_hash"))
+    node_list = tree_to_list(root)
 
     df = DataFrame(node_list)
-    df = df.sort_values(by=["depth"])
-    print(df.head())
-    print(df[["depth", "move", "count", "color"]])
+    df["len"] = df["data"].str.len()
+    print(df.sort_values(by=["len"], ascending=False))
 
 
 @app.cli.command()

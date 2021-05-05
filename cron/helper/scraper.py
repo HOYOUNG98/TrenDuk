@@ -104,6 +104,10 @@ def parse_game(content, link):
         move["move"] = split_move[1:]
         gibo["moves"].append(move)
 
+    gibo["_id"] = hash(
+        (gibo["date"], gibo["result"], gibo["title"], gibo["blackPlayer"]["name"], gibo["whitePlayer"]["name"])
+    )
+
     return gibo
 
 
