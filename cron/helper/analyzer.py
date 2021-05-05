@@ -1,6 +1,6 @@
 from bson.objectid import ObjectId
 
-RECURSION_DEPTH = 8
+RECURSION_DEPTH = 16
 
 
 def assort_corners(moves):
@@ -60,84 +60,73 @@ def assort_corners(moves):
 
 
 def build_tree(root, moves, gibo):
-
     if len(moves) == 0:
         return root
 
     move = moves[0]
-    win = 0
-    lose = 0
+    win = True
 
-    if move["color"] == check_winner(gibo["result"]):
-        win += 1
-    else:
-        lose += 1
+    if move["color"] != check_winner(gibo["result"]):
+        win = False
 
+    # Find matching child from current node
     matching_child = {}
     for child in root["children"]:
         if child["color"] == move["color"] and child["move"] == move["move"]:
             matching_child = child
 
+    # If no matching child found, create a new node
     if not matching_child:
-        new_node = {
-            "root": False,
+        new_child = {
+            "children": [],
             "parent": root,
             "depth": RECURSION_DEPTH - len(moves) + 1,
-            "children": [],
             "move": move["move"],
             "color": move["color"],
-            "games": [gibo["_id"]],
-            "yearlyStat": [{"year": gibo["date"][:4], "count": 1, "win": win, "lose": lose}],
-            "count": 1,
+            "data": [{"date": gibo["date"], "win": win, "gibo": gibo["_id"]}],
         }
+        root["children"].append(new_child)
 
-        root["children"].append(new_node)
-        build_tree(new_node, moves[1:], gibo)
+        build_tree(new_child, moves[1:], gibo)
+
+    # If matching child found, only add new data
     else:
-        found = False
-        for yearly_stat in matching_child["yearlyStat"]:
-            if yearly_stat["year"] == gibo["date"][:4]:
-                yearly_stat["count"] += 1
-                yearly_stat["win"] += win
-                yearly_stat["lose"] += lose
-                found = True
-
-        if not found:
-            matching_child["yearlyStat"].append(
-                {"year": gibo["date"][:4], "count": 1, "win": win, "lose": lose,}
-            )
-        if "count" in root.keys():
-            root["count"] += 1
+        matching_child["data"].append(
+            {
+                "date": gibo["date"],
+                "win": win,
+                "gibo": gibo["_id"],
+            }
+        )
         build_tree(matching_child, moves[1:], gibo)
 
     return root
 
 
-def tree_to_list(root, assignedID, parentID=None):
-    childrenID = []
+def tree_to_list(root, parent_id=None, current_id=hash("root_hash")):
     return_value = []
 
+    # Traverse through children
+    children_id_list = []
     for child in root["children"]:
-        newID = hash((child["move"], child["color"], parentID))
-        childrenID.append(newID)
-        output = tree_to_list(child, newID, assignedID)
+        child_id = hash((child["move"], child["color"], current_id))
+        children_id_list.append(child_id)
+
+        output = tree_to_list(child, current_id, child_id)
         return_value = return_value + output
 
-    if root["root"]:
-        return_value.append({"_id": assignedID, "root": True, "children": childrenID})
+    if root["depth"] == 0:
+        return_value.append({"_id": current_id, "children": children_id_list, "depth": root["depth"]})
     else:
         return_value.append(
             {
-                "_id": assignedID,
-                "root": False,
-                "move": root["move"],
-                "parent": parentID,
-                "children": childrenID,
+                "_id": current_id,
+                "parent": parent_id,
+                "children": children_id_list,
                 "depth": root["depth"],
-                "games": root["games"],
-                "yearlyStat": root["yearlyStat"],
-                "count": root["count"],
+                "move": root["move"],
                 "color": root["color"],
+                "data": root["data"],
             }
         )
 

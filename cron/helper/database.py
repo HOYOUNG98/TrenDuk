@@ -1,4 +1,4 @@
-from pymongo import MongoClient
+from pymongo import MongoClient, UpdateOne
 from pandas import DataFrame
 
 client = MongoClient("mongodb+srv://kevin4163:ghdi4163@trenduk.sucyo.mongodb.net/trenduk?retryWrites=true&w=majority")
@@ -22,3 +22,9 @@ def fetchAllGibos():
 def fetchAllNodes():
     df = DataFrame(list(node.find()))
     return df
+
+
+def updateManyNodes(object_list):
+    operations = []
+    for node in object_list:
+        operations.append(UpdateOne({"_id": node["_id"]}, {}))
