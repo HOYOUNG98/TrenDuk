@@ -40,3 +40,8 @@ def upsertManyNodes(object_list):
 
     result = node_collection.bulk_write(operations)
     return result
+
+
+def findGiboByFilter(filter):
+    result = gibo.find(filter)
+    return result

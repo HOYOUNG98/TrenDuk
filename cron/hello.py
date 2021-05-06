@@ -18,13 +18,13 @@ MAX_PAGE = 465
 @app.cli.command()
 def scheduled():
     """Run scheduled job."""
-    for page in range(1, MAX_PAGE):
+    for page in range(1, 5):
         link = "https://www.cyberoro.com/bcast/gibo.oro?param=1&div=1&Tdiv=B&Sdiv=2&pageNo={0}&blockNo=1".format(page)
         content = request(link)
         links, duplicate_found = parse_links(content)
 
         if duplicate_found == False:
-            print("DUPLICATE")
+            print("Duplicate Found: Ending Process")
             break
 
         gibo_objects = []
@@ -36,8 +36,6 @@ def scheduled():
                 continue
 
             gibo_objects.append(gibo_object)
-        print(DataFrame(gibo_objects).head())
-        insertManyGibos(gibo_objects)
 
         page += 1
 
@@ -49,10 +47,10 @@ def scheduled():
             for moves in corners:
                 root = build_tree(root, moves, gibo_object)
 
-        node_list = tree_to_list(root, assignedID=hash("root_hash"))
+        node_list = tree_to_list(root)
 
-        insertManyNodes(node_list)
-        insertManyNodes(node_list)
+        insertManyGibos(gibo_objects)
+        upsertManyNodes(node_list)
 
 
 @app.cli.command()
