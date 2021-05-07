@@ -23,8 +23,8 @@ def scheduled():
         content = request(link)
         links, duplicate_found = parse_links(content)
 
-        if duplicate_found == False:
-            print("Duplicate Found: Ending Process")
+        if duplicate_found == False and len(links) == 0:
+            print("Reached Endpoint")
             break
 
         gibo_objects = []
@@ -39,8 +39,6 @@ def scheduled():
 
         page += 1
 
-        print("Estimated: {0}/{1}".format(page, MAX_PAGE))
-
         root = {"depth": 0, "children": []}
         for gibo_object in gibo_objects:
             corners = assort_corners(gibo_object["moves"])
@@ -51,6 +49,10 @@ def scheduled():
 
         insertManyGibos(gibo_objects)
         upsertManyNodes(node_list)
+
+        if duplicate_found == False:
+            print("Duplicate Found: Ending Process")
+            break
 
 
 @app.cli.command()
