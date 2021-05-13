@@ -3,8 +3,6 @@ import requests
 import bs4
 from pymongo import MongoClient
 
-# local imports
-from helper.database import findGiboByFilter
 
 """
     In cyberoro page, we can mainly consider 2 types of links
@@ -37,15 +35,14 @@ def parse_links(content):
         link = div.find("a")["href"][21:-2]
         link = link[1 : (link.find(",") - 1)]
 
-        results = findGiboByFilter({"link": link})
-        if results.count() > 0:
-            return links, False
+        # Check For duplicate
         links.append(link)
 
-    return links, True
+    return links
 
 
-def parse_game(content, link):
+def parse_game(link):
+    content = request(link)
     content = content.prettify()
     end_semi_colon = content.find(";")
 
@@ -106,6 +103,9 @@ def parse_game(content, link):
         move["color"] = split_move[:1]
         move["move"] = split_move[1:]
         gibo["moves"].append(move)
+
+    if gibo["blackPlayer"] == {} or gibo["whitePlayer"] == {}:
+        return None
 
     if (
         "아마" in gibo["blackPlayer"]["name"]
