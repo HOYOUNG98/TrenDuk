@@ -1,5 +1,3 @@
-from bson.objectid import ObjectId
-
 RECURSION_DEPTH = 16
 
 

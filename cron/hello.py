@@ -1,8 +1,9 @@
 import time
 from flask import Flask
-from pymongo import MongoClient
-from pandas import DataFrame, json_normalize
+from pandas import DataFrame, read_csv
 import os
+import json
+import csv
 
 from helper.scraper import request, parse_links, parse_game
 from helper.analyzer import assort_corners, build_tree, tree_to_list
@@ -18,7 +19,7 @@ MAX_PAGE = 500
 def fetchGames():
 
     gibo_df = []
-    for page in range(1, MAX_PAGE):
+    for page in range(1, 2):
         link = "https://www.cyberoro.com/bcast/gibo.oro?param=1&div=1&Tdiv=B&Sdiv=2&pageNo={0}&blockNo=1".format(page)
         content = request(link)
         links = parse_links(content)
@@ -39,7 +40,30 @@ def fetchGames():
     cols = cols[0:3] + cols[4:] + [cols[3]]
     gibo_df = gibo_df[cols]
 
-    gibo_df.to_csv("output.csv", index=False, encoding="utf-8-sig")
+    print(gibo_df)
+    gibo_df.to_csv("out.csv", index=False, encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
+
+
+@app.cli.command()
+def generateNodes():
+    gibo_df = read_csv("games.csv")
+
+    root = {"depth": 0, "children": []}
+    for index, gibo in gibo_df.iterrows():
+        gibo = gibo.to_dict()
+        moves = json.loads(gibo["moves"].replace("'", '"'))
+        corners = assort_corners(moves)
+        for moves in corners:
+            root = build_tree(root, moves, gibo)
+
+        if index == 6000:
+            break
+        print(index)
+
+    node_df = tree_to_list(root)
+
+    node_df = DataFrame(node_df)
+    node_df.to_csv("nodes.csv", index=False, encoding="utf-8-sig")
 
 
 # @app.cli.command()
@@ -112,12 +136,6 @@ def fetchGames():
 #     upsertManyNodes(node_list)
 #     result = upsertManyNodes(node_list)
 #     print(result)
-
-
-@app.cli.command()
-def test2():
-    df = fetchAllGibos()
-    print(df.head())
 
 
 @app.route("/")
