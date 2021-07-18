@@ -1,7 +1,8 @@
+# library imports
 from typing import List
 from pandas.core.frame import DataFrame
-
 from pandas.io.parsers import read_csv
+import csv
 
 
 RECURSION_DEPTH = 16
@@ -37,7 +38,7 @@ def assortCorners(moves: List[str]):
                 {"color": color, "move": reflect(x) + reflect(y)})
         if x >= "j" and y <= "j" and len(bottom_left) < RECURSION_DEPTH:
             bottom_left.append(
-                {"color": color, "move": x + reflect(y)})
+                {"color": color, "move": x + y})
 
     all_corners = [top_left, top_right, bottom_left, bottom_right]
 
@@ -78,16 +79,19 @@ def createNodes(moves, game, nodes={}):
 
         if current_id not in nodes:
             nodes[current_id] = {
-                "_id": current_id,
+                '_id': current_id,
                 "parent": parent_id,
                 "depth": iteration,
                 "move": move["move"],
-                "color": move["color"],
-                "data": [{"date": game["date"], "win": win, "link": game["link"]}]
+                'color': move["color"],
+                "num_data": 1,
+                "num_win": 1,
+                "link": [game["link"]],
             }
         else:
-            nodes[current_id]["data"].append(
-                {"date": game["date"], "win": win, "link": game["link"]})
+            nodes[current_id]["num_win"] += 1 if win else 0
+            nodes[current_id]["num_data"] += 1
+            nodes[current_id]["link"].append(game["link"])
 
         parent_id = current_id
 
@@ -153,7 +157,7 @@ def dictListFind(lst, key, value):
 
 if __name__ == "__main__":
 
-    # original_df = read_csv('cyberoro_games.csv')
+    # original_df = read_csv("cyberoro_games.csv")
 
     # for i in range(original_df.shape[0]):
     #     moves = original_df.iloc[i]["moves"].split(";")
@@ -162,21 +166,17 @@ if __name__ == "__main__":
     #         print()
     #     break
 
-    test_df = read_csv('cyberoro_games.csv')
+    test_df = read_csv("cyberoro_games.csv")
     test_df = test_df[(test_df["result"] != "")]
     nodes = {}
-    print(test_df.shape)
     for index, row in test_df.iterrows():
         game = row.to_dict()
         moves = game["moves"].split(";")
-        print(game["result"], index)
         corners = assortCorners(moves)
         for corner in corners:
             nodes = createNodes(corner, game, nodes)
 
     nodes_df = DataFrame(nodes.values())
-    nodes_df['data_length'] = nodes_df['data'].str.len()
-    print(nodes_df.sort_values(by=['depth', 'move', 'color']))
-    new_df = nodes_df[(nodes_df["depth"] == 0)]
-    print(new_df["move"].unique())
-    print(nodes_df.shape)
+    nodes_df.sort_values(by=["depth", "move", "color"])
+    nodes_df.to_csv("cyberoro_nodes.csv", index=False,
+                    encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
