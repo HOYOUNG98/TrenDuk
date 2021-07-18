@@ -1,5 +1,5 @@
 # library imports
-from flask import Flask
+from flask import Flask, request
 from pandas import read_csv, DataFrame
 import csv
 
@@ -9,8 +9,60 @@ from analyzer import assortCorners
 
 app = Flask(__name__)
 
+# Initialize database...?
+games_df = read_csv("cyberoro_games.csv")
+nodes_df = read_csv("cyberoro_nodes.csv")
 
-@app.cli.command()
+
+@app.route("/")
+def index():
+    return "Hello World"
+
+
+@app.route("/getGibo")
+def getGibo():
+    link = request.args.get('link', type=str)
+    game = games_df.loc[games_df['link'] == link]
+
+    return {"status": 200, "game": game.to_dict('records')}
+
+
+@app.route("/getGibosByMove")
+def getGibosBymove():
+    move = request.args.get('move', default=0, type=str)
+    parent = request.args.get('parent', default='root', type=str)
+    color = request.args.get('color', default='B', type=str)
+
+    move = nodes_df.loc[(nodes_df['move'] == move) & (nodes_df['parent'] == parent) & (
+        nodes_df['color'] == color)]
+    gibos = move.iloc[0]['link']
+
+    return {"status": 200, "gibos": gibos}
+
+
+@ app.route("/getBranches")
+def getBranches():
+    depth = request.args.get('depth', default=0, type=int)
+    parent = request.args.get('parent', default='root', type=str)
+    color = request.args.get('color', default='B', type=str)
+
+    popular_moves = nodes_df.loc[(nodes_df['depth'] == depth) & (nodes_df['parent'] == parent) & (
+        nodes_df['color'] == color)].sort_values(by=['num_data'], ascending=False)[:5]
+    popular_moves = popular_moves.drop(columns=["data"])
+    popular_moves['num_total'] = popular_moves['num_data'].sum()
+
+    # get win percentage
+    popular_moves['win_percentage'] = round(
+        popular_moves['num_win'] / popular_moves['num_data'] * 100, 1)
+
+    # get pick percentage
+    popular_moves['pick_percentage'] = round(
+        popular_moves['num_data']/popular_moves['num_total'] * 100, 1)
+
+    return {"status": 200, "white": popular_moves.to_dict('records')}
+
+
+@ app.cli.command()
 def updateGames():
     '''catch up games from cyberoro'''
 

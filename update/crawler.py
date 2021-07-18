@@ -103,7 +103,7 @@ def parseGame(link: str):
 
 
 if __name__ == "__main__":
-    original_df = read_csv('cyberoro.csv')
+    original_df = read_csv('cyberoro_games.csv')
     latest_link = original_df.iloc[0]["link"]
     gibo_list = []
     for page in range(1, 800):
@@ -128,5 +128,5 @@ if __name__ == "__main__":
     # fetch original csv to preprend DF
     gibo_df.append(original_df, sort=False)
 
-    gibo_df.to_csv("cyberoro.csv", index=False,
+    gibo_df.to_csv("cyberoro_games.csv", index=False,
                    encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
