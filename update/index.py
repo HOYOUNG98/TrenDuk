@@ -1,6 +1,7 @@
 # library imports
 from flask import Flask, request
 from pandas import read_csv, DataFrame
+from os import listdir
 import csv
 
 # local imports
@@ -42,24 +43,33 @@ def getGibosBymove():
 
 @ app.route("/getBranches")
 def getBranches():
+    filenames = listdir("./data/moves")
     depth = request.args.get('depth', default=0, type=int)
     parent = request.args.get('parent', default='root', type=str)
     color = request.args.get('color', default='B', type=str)
 
-    popular_moves = nodes_df.loc[(nodes_df['depth'] == depth) & (nodes_df['parent'] == parent) & (
-        nodes_df['color'] == color)].sort_values(by=['num_data'], ascending=False)[:5]
-    popular_moves = popular_moves.drop(columns=["data"])
-    popular_moves['num_total'] = popular_moves['num_data'].sum()
+    branches = []
+    for file in filenames:
+        nodes_df = read_csv("./data/moves/"+file)
+        popular_moves = nodes_df.loc[(nodes_df['depth'] == depth) & (nodes_df['parent'] == parent) & (
+            nodes_df['color'] == color)].sort_values(by=['num_data'], ascending=False)[:5]
+        popular_moves['num_total'] = popular_moves['num_data'].sum()
 
-    # get win percentage
-    popular_moves['win_percentage'] = round(
-        popular_moves['num_win'] / popular_moves['num_data'] * 100, 1)
+        # get win percentage
+        popular_moves['win_percentage'] = round(
+            popular_moves['num_win'] / popular_moves['num_data'] * 100, 1)
 
-    # get pick percentage
-    popular_moves['pick_percentage'] = round(
-        popular_moves['num_data']/popular_moves['num_total'] * 100, 1)
+        # get pick percentage
+        popular_moves['pick_percentage'] = round(
+            popular_moves['num_data']/popular_moves['num_total'] * 100, 1)
 
-    return {"status": 200, "white": popular_moves.to_dict('records')}
+        popular_moves = popular_moves.drop(
+            columns=["link", "num_data", "num_win", "num_total", "parent"])
+        popular_moves['year'] = file[:4]
+
+        branches.append(popular_moves.to_dict('records'))
+
+    return {"status": 200, "branches": branches}
 
 
 @ app.cli.command()

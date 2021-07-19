@@ -6,14 +6,19 @@ import csv
 
 
 def request(link: str):
-    response = requests.get(link)
-    decoded_content = BeautifulSoup(
-        response.content.decode("euc-kr", "replace"), "html.parser")
-    return decoded_content
+    try:
+        response = requests.get(link)
+        decoded_content = BeautifulSoup(
+            response.content.decode("euc-kr", "replace"), "html.parser")
+        return decoded_content
+    except requests.ConnectionError:
+        return None
 
 
 def parsePage(link: str, latest_link: str = None):
     content: BeautifulSoup = request(link)
+    if link == None:
+        return None
     link_divs = content.find_all(class_="board_pd", align="left")
 
     links = []
@@ -29,7 +34,10 @@ def parsePage(link: str, latest_link: str = None):
 
 
 def parseGame(link: str):
-    content = request(link).prettify()
+    content = request(link)
+    if content == None:
+        return None
+    content = content.prettify()
     end_semi_colon = content.find(";")
 
     # some files don't have ; ending
@@ -71,7 +79,11 @@ def parseGame(link: str):
             # Amateur games are ignored
             if "아마" in category[3:]:
                 return None
-            gibo["black_player_rank"] = category[3:]
+            if "&" in category[3:]:
+                return None
+            if "-" in category[3:]:
+                return None
+            gibo["black_player_rank"] = category[3:].strip(' ')
         elif field == "PW":
             # Amateur games are ignored
             if "아마" in category[3:]:
@@ -81,7 +93,11 @@ def parseGame(link: str):
             # Amateur games are ignored
             if "아마" in category[3:]:
                 return None
-            gibo["white_player_rank"] = category[3:]
+            if "&" in category[3:]:
+                return None
+            if "-" in category[3:]:
+                return None
+            gibo["white_player_rank"] = category[3:].strip(' ')
         elif field == "HD":
             gibo["handicap"] = category[3:]
         else:
@@ -99,13 +115,17 @@ def parseGame(link: str):
     moves = moves.replace("[", "").replace("]", "")
     gibo["moves"] = moves
 
+    # Comments in moves messes up data
+    if "C" in gibo["moves"]:
+        return None
+
     return gibo
 
 
 if __name__ == "__main__":
-    original_df = read_csv('cyberoro_games.csv')
+    original_df = read_csv('default_games.csv')
     latest_link = original_df.iloc[0]["link"]
-    gibo_list = []
+    gibo_dict = {}
     for page in range(1, 800):
         link = "https://www.cyberoro.com/bcast/gibo.oro?param=1&div=1&Tdiv=B&Sdiv=2&pageNo={0}&blockNo=1".format(
             page)
@@ -114,7 +134,13 @@ if __name__ == "__main__":
         for link in links:
             gibo = parseGame(link)
             if gibo:
-                gibo_list.append(gibo)
+                if "date" not in gibo.keys():
+                    continue
+                year = gibo["date"][:4]
+                if year not in gibo_dict.keys():
+                    gibo_dict[year] = [gibo]
+                else:
+                    gibo_dict[year].append(gibo)
             else:
                 continue
 
@@ -122,11 +148,7 @@ if __name__ == "__main__":
         if len(links) != 20:
             break
 
-    print(len(gibo_list))
-    gibo_df = DataFrame(gibo_list)
-
-    # fetch original csv to preprend DF
-    gibo_df.append(original_df, sort=False)
-
-    gibo_df.to_csv("cyberoro_games.csv", index=False,
-                   encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
+    for key in gibo_dict.keys():
+        gibo_df = DataFrame(gibo_dict[key])
+        gibo_df.to_csv("./data/{}_cyberoro_games.csv".format(key), index=False,
+                       encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
