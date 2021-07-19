@@ -3,6 +3,7 @@ from typing import List
 from pandas.core.frame import DataFrame
 from pandas.io.parsers import read_csv
 import csv
+from os import listdir
 
 
 RECURSION_DEPTH = 16
@@ -142,6 +143,9 @@ def reflect(character):
 
 
 def checkWinner(result: str):
+    # check wrong typings
+    if type(result) != str:
+        return False
     if result.find("흑") == -1:
         return "W"
     else:
@@ -166,17 +170,21 @@ if __name__ == "__main__":
     #         print()
     #     break
 
-    test_df = read_csv("cyberoro_games.csv")
-    test_df = test_df[(test_df["result"] != "")]
-    nodes = {}
-    for index, row in test_df.iterrows():
-        game = row.to_dict()
-        moves = game["moves"].split(";")
-        corners = assortCorners(moves)
-        for corner in corners:
-            nodes = createNodes(corner, game, nodes)
+    filenames = listdir("./data/games")
+    print(filenames)
+    for file in filenames:
+        year = file[:4]
+        current_csv = read_csv("./data/games/"+file)
+        current_csv = current_csv[(current_csv["result"] != "")]
+        nodes = {}
+        for index, row in current_csv.iterrows():
+            game = row.to_dict()
+            moves = game["moves"].split(";")
+            corners = assortCorners(moves)
+            for corner in corners:
+                nodes = createNodes(corner, game, nodes)
 
-    nodes_df = DataFrame(nodes.values())
-    nodes_df.sort_values(by=["depth", "move", "color"])
-    nodes_df.to_csv("cyberoro_nodes.csv", index=False,
-                    encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
+        nodes_df = DataFrame(nodes.values())
+        nodes_df.sort_values(by=["depth", "move", "color"])
+        nodes_df.to_csv("./data/moves/{}_cyberoro_nodes.csv".format(year), index=False,
+                        encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
