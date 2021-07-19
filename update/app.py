@@ -107,3 +107,7 @@ def updateGames():
     for gibo in gibo_list:
         moves = gibo["move"].split(";")
         print(assortCorners(moves))
+
+
+if __name__ == "__main__":
+    app.run(host='0.0.0.0')
