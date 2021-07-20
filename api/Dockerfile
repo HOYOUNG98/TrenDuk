@@ -1,16 +1,15 @@
-FROM node:alpine
+FROM python:3.8-slim-buster
 
-WORKDIR /usr/app
+WORKDIR /usr/src/app
 
-COPY package*.json ./
-
-RUN npm install
+COPY requirements.txt requirements.txt
+RUN pip3 install -r requirements.txt
 
 COPY . .
 
-RUN npm run build
-COPY .env ./dist/
-WORKDIR ./dist/
+ENV FLASK_APP app
+ENV FLASK_ENV production
 
-EXPOSE 4000
-CMD node src/index.js
+EXPOSE 5000
+
+CMD [ "python3", "app.py"]
