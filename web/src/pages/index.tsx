@@ -6,21 +6,17 @@ import { useSelector, useDispatch } from "react-redux";
 import { WGoBoard } from "../components/WGoBoard";
 import { Chart } from "../components/Chart";
 import { RootState } from "../store";
-import {
-  pickRateConversion,
-  winRateConversion,
-} from "../helpers/rechartConversion";
 import { NavBar } from "../components/NavBar";
 import { HStack, Radio, RadioGroup, Wrap } from "@chakra-ui/react";
 
 const Index: React.FC = () => {
-  const { branchStats, hoverPoint, selectedColor } = useSelector(
-    (state: RootState) => ({
-      branchStats: state.node.branchStats,
+  const { currentYearlyPick, currentYearlyWin, hoverPoint, selectedColor } =
+    useSelector((state: RootState) => ({
+      currentYearlyPick: state.node.currentYearlyPick,
+      currentYearlyWin: state.node.currentYearlyWin,
       hoverPoint: state.current.hoverPoint,
       selectedColor: state.current.selectedColor,
-    })
-  );
+    }));
 
   const dispatch = useDispatch();
   return (
@@ -47,16 +43,17 @@ const Index: React.FC = () => {
         </Wrap>
         <Wrap marginRight="20px">
           <Chart
-            chartData={pickRateConversion(branchStats, selectedColor)}
+            chartData={currentYearlyPick}
             hoverPoint={hoverPoint}
             variant={"선택률"}
           />
           <Chart
-            chartData={winRateConversion(branchStats, selectedColor)}
+            chartData={currentYearlyWin}
             hoverPoint={hoverPoint}
             variant={"승률"}
           />
         </Wrap>
+        {console.log(currentYearlyWin, currentYearlyPick)}
       </HStack>
     </>
   );

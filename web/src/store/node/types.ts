@@ -22,20 +22,30 @@ export interface INodeStats {
 
 export interface NodeState {
   branchPoints: { black: Array<INodeMoves>; white: Array<INodeMoves> };
-  branchStats: { black: Array<INodeStats>; white: Array<INodeStats> };
+  currentYearlyWin: Array<Object>;
+  currentYearlyPick: Array<Object>;
 }
 
 export const GET_BRANCH_POINTS = "GET_BRANCH_POINTS";
-export const GET_BRANCH_STATS = "GET_BRANCH_STATS";
+export const GET_CURRENT_YEARLY_WIN = "GET_CURRENT_YEARLY_WIN";
+export const GET_CURRENT_YEARLY_PICK = "GET_CURRENT_YEARLY_PICK";
 
 interface getBranchPoints {
   type: typeof GET_BRANCH_POINTS;
   payload: Array<INode>;
 }
 
-interface getBranchStats {
-  type: typeof GET_BRANCH_STATS;
-  payload: Array<INode>;
+interface getCurrentYearlyWin {
+  type: typeof GET_CURRENT_YEARLY_WIN;
+  payload: Array<Object>;
 }
 
-export type NodeActionType = getBranchPoints | getBranchStats;
+interface getCurrentYearlyPick {
+  type: typeof GET_CURRENT_YEARLY_PICK;
+  payload: Array<Object>;
+}
+
+export type NodeActionType =
+  | getBranchPoints
+  | getCurrentYearlyWin
+  | getCurrentYearlyPick;

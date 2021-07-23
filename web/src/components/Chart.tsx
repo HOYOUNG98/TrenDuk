@@ -39,7 +39,7 @@ export const Chart: React.FC<ChartProps> = ({
         />
 
         <Legend />
-        {[1, 2, 3, 4].map((i) => {
+        {["pd", "pc", "qc", "qd", "qe"].map((i) => {
           return (
             <Line
               name={`${i}번 ${variant}`}
