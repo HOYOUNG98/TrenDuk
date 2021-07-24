@@ -19,6 +19,7 @@ export async function getBranches(
       const responseData = response.data.branches;
       let winRateData = [];
       let pickRateData = [];
+      let currentMoves = new Set<string>();
       for (let i = 0; i < responseData.length; i++) {
         const yearly = responseData[i];
         let yearlyData1: any = { year: yearly[0]["year"] };
@@ -27,10 +28,16 @@ export async function getBranches(
           const move = yearly[j];
           yearlyData1[move.move] = move.win_percentage;
           yearlyData2[move.move] = move.pick_percentage;
+          currentMoves.add(move.move);
         }
         winRateData.push(yearlyData1);
         pickRateData.push(yearlyData2);
       }
+
+      store.dispatch({
+        type: "GET_CURRENT_MOVES",
+        payload: currentMoves,
+      });
 
       store.dispatch({
         type: "GET_CURRENT_YEARLY_WIN",

@@ -10,13 +10,19 @@ import { NavBar } from "../components/NavBar";
 import { HStack, Radio, RadioGroup, Wrap } from "@chakra-ui/react";
 
 const Index: React.FC = () => {
-  const { currentYearlyPick, currentYearlyWin, hoverPoint, selectedColor } =
-    useSelector((state: RootState) => ({
-      currentYearlyPick: state.node.currentYearlyPick,
-      currentYearlyWin: state.node.currentYearlyWin,
-      hoverPoint: state.current.hoverPoint,
-      selectedColor: state.current.selectedColor,
-    }));
+  const {
+    currentYearlyPick,
+    currentYearlyWin,
+    currentMoves,
+    hoverPoint,
+    selectedColor,
+  } = useSelector((state: RootState) => ({
+    currentYearlyPick: state.node.currentYearlyPick,
+    currentYearlyWin: state.node.currentYearlyWin,
+    currentMoves: state.node.currentMoves,
+    hoverPoint: state.current.hoverPoint,
+    selectedColor: state.current.selectedColor,
+  }));
 
   const dispatch = useDispatch();
   return (
@@ -45,11 +51,13 @@ const Index: React.FC = () => {
           <Chart
             chartData={currentYearlyPick}
             hoverPoint={hoverPoint}
+            moves={currentMoves}
             variant={"선택률"}
           />
           <Chart
             chartData={currentYearlyWin}
             hoverPoint={hoverPoint}
+            moves={currentMoves}
             variant={"승률"}
           />
         </Wrap>

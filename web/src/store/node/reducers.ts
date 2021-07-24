@@ -4,11 +4,13 @@ import {
   GET_CURRENT_YEARLY_PICK,
   NodeActionType,
   NodeState,
+  GET_CURRENT_MOVES,
 } from "./types";
 import { INode } from "../../types";
 
 const initState: NodeState = {
   branchPoints: { black: [], white: [] },
+  currentMoves: new Set(),
   currentYearlyWin: [],
   currentYearlyPick: [],
 };
@@ -45,6 +47,12 @@ export const nodeReducer = (
       return {
         ...state,
         branchPoints: { black: blackMoves, white: whiteMoves },
+      };
+
+    case GET_CURRENT_MOVES:
+      return {
+        ...state,
+        currentMoves: action.payload,
       };
 
     case GET_CURRENT_YEARLY_WIN:
