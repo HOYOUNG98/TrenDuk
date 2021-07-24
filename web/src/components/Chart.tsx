@@ -13,14 +13,16 @@ interface ChartProps {
   chartData: object[];
   hoverPoint: string;
   variant: string;
+  moves: Set<string>;
 }
 
 export const Chart: React.FC<ChartProps> = ({
   chartData,
   hoverPoint,
+  moves,
   variant,
 }) => {
-  const colors = ["#4C212A", "#3A6952", "#FC814A", "#8797AF"];
+  const arrayMoves = Array.from(moves);
 
   return (
     <ResponsiveContainer width="100%" height={250}>
@@ -38,16 +40,14 @@ export const Chart: React.FC<ChartProps> = ({
           }}
         />
 
-        <Legend />
-        {["pd", "pc", "qc", "qd", "qe"].map((i) => {
+        {arrayMoves.map((move) => {
           return (
             <Line
-              name={`${i}번 ${variant}`}
-              dataKey={i}
-              key={i}
+              dataKey={move}
+              key={move}
               type="linear"
-              stroke={colors[i]}
-              strokeWidth={hoverPoint === i.toString() ? 3 : 1}
+              stroke={"#888488"}
+              strokeWidth={3}
             />
           );
         })}

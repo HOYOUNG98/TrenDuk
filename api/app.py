@@ -50,6 +50,7 @@ def getBranches():
     color = request.args.get("color", default="B", type=str)
 
     branches = []
+    filenames.sort()
     for file in filenames:
         nodes_df = read_csv("./data/moves/" + file)
         popular_moves = nodes_df.loc[
