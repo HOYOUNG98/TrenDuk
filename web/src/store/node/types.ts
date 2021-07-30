@@ -1,4 +1,4 @@
-import { INode } from "../../types";
+import { INode, IYearlyReChartData } from "../../types";
 
 export interface INodeMoves {
   id: string;
@@ -22,9 +22,9 @@ export interface INodeStats {
 
 export interface NodeState {
   branchPoints: { black: Array<INodeMoves>; white: Array<INodeMoves> };
-  currentYearlyWin: Array<Object>;
-  currentYearlyPick: Array<Object>;
-  currentMoves: Set<string>;
+  currentYearlyWin: Array<IYearlyReChartData>;
+  currentYearlyPick: Array<IYearlyReChartData>;
+  currentMoves: Array<INode>;
 }
 
 export const GET_BRANCH_POINTS = "GET_BRANCH_POINTS";
@@ -39,17 +39,17 @@ interface getBranchPoints {
 
 interface getCurrentMoves {
   type: typeof GET_CURRENT_MOVES;
-  payload: Set<string>;
+  payload: Array<INode>;
 }
 
 interface getCurrentYearlyWin {
   type: typeof GET_CURRENT_YEARLY_WIN;
-  payload: Array<Object>;
+  payload: Array<IYearlyReChartData>;
 }
 
 interface getCurrentYearlyPick {
   type: typeof GET_CURRENT_YEARLY_PICK;
-  payload: Array<Object>;
+  payload: Array<IYearlyReChartData>;
 }
 
 export type NodeActionType =

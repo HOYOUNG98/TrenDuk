@@ -20,18 +20,18 @@ export interface IGibo {
 
 export interface INode {
   _id: string;
-  root?: boolean;
-  parentID: string;
-  childrenID?: Array<string>;
+  depth: number;
   move: string;
-  color: string;
-  games?: Array<string>;
-  yearlyStat: Array<YearlyStat>;
+  color: "B" | "W";
 }
 
-interface YearlyStat {
-  year: string;
-  count: number;
-  win?: number;
-  lose?: number;
+export interface IYearlyNode extends INode {
+  pick_percentage: number;
+  win_percentage: number;
+  year: number;
+}
+
+export interface IYearlyReChartData {
+  year: number;
+  [x: string]: number;
 }

@@ -53,6 +53,7 @@ def getBranches():
     filenames.sort()
     for file in filenames:
         nodes_df = read_csv("./data/moves/" + file)
+
         popular_moves = nodes_df.loc[
             (nodes_df["depth"] == depth) & (nodes_df["parent"] == parent) & (nodes_df["color"] == color)
         ].sort_values(by=["num_data"], ascending=False)[:5]
@@ -68,6 +69,9 @@ def getBranches():
         popular_moves["year"] = file[:4]
 
         branches.append(popular_moves.to_dict("records"))
+
+    if len([inner for outer in branches for inner in outer]) == 0:
+        return {"status": 200, "message": "no moves meets given criteria"}
 
     return {"status": 200, "branches": branches}
 
@@ -108,4 +112,4 @@ def updateGames():
 
 
 if __name__ == "__main__":
-    app.run(host="0.0.0.0")
+    app.run(host="0.0.0.0", debug=True)

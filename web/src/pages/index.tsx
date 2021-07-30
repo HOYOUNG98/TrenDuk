@@ -61,7 +61,6 @@ const Index: React.FC = () => {
             variant={"승률"}
           />
         </Wrap>
-        {console.log(currentYearlyWin, currentYearlyPick)}
       </HStack>
     </>
   );

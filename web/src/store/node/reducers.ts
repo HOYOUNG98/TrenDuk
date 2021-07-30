@@ -1,3 +1,7 @@
+// library imports
+import _ from "lodash";
+
+// local imports
 import {
   GET_BRANCH_POINTS,
   GET_CURRENT_YEARLY_WIN,
@@ -10,7 +14,7 @@ import { INode } from "../../types";
 
 const initState: NodeState = {
   branchPoints: { black: [], white: [] },
-  currentMoves: new Set(),
+  currentMoves: [],
   currentYearlyWin: [],
   currentYearlyPick: [],
 };
@@ -50,9 +54,11 @@ export const nodeReducer = (
       };
 
     case GET_CURRENT_MOVES:
+      // Remove all duplicates in the list
+      const currentMoves = _.uniqBy(action.payload, "_id");
       return {
         ...state,
-        currentMoves: action.payload,
+        currentMoves,
       };
 
     case GET_CURRENT_YEARLY_WIN:
