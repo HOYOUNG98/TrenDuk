@@ -5,17 +5,18 @@ import { getBranches } from "../api/getBranches";
 
 // local imports
 import { RootState } from "../store";
-import { INodeMoves as INode } from "../store/node/types";
+import { INode } from "../types";
 
 declare const window: any;
 
 export const WGoBoard: React.FC = () => {
   const [selectedNodes, updateSelectedNodes] = useState<INode[]>([]);
 
-  const { branchPoints, selectedColor } = useSelector(
+  const { branchPoints, selectedColor, currentMoves } = useSelector(
     (state: RootState) => ({
       branchPoints: state.node.branchPoints,
       selectedColor: state.current.selectedColor,
+      currentMoves: state.node.currentMoves,
     }),
     shallowEqual
   );
@@ -30,6 +31,7 @@ export const WGoBoard: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    // Initiate Board
     if (refBoard && refBoard.current) {
       var board = new window.WGo.Board(refBoard.current, {
         width: 500,
@@ -42,50 +44,31 @@ export const WGoBoard: React.FC = () => {
       });
     }
 
-    const branchNodes: INode[] =
-      selectedColor === "B" ? branchPoints.black : branchPoints.white;
-
-    branchNodes.forEach((node, i) => {
-      board.addObject({
-        x: node.x,
-        y: node.y,
-        type: "LB",
-        text: i + 1,
-      });
-    });
-
-    selectedNodes.forEach((node) => {
-      board.addObject({
-        x: node.x,
-        y: node.y,
-        c: node.color === "B" ? window.WGo.B : window.WGo.W,
-      });
-    });
-
+    // To catch user's click activity
     board.addEventListener("click", function (x: number, y: number) {
-      const branchNodes: INode[] =
-        selectedColor === "B" ? branchPoints.black : branchPoints.white;
+      const clickedMove =
+        String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
+      console.log(clickedMove, currentMoves);
 
-      branchNodes.forEach((node) => {
-        if (x === node.x && y === node.y) {
-          getBranches(node.id);
+      currentMoves.forEach((node) => {
+        if (node.move === clickedMove) {
+          console.log(node);
+          getBranches(1, "7480718411854385318", "W");
           updateSelectedNodes([...selectedNodes, node]);
-          dispatch({ type: "SELECT_COLOR" });
-          dispatch({ type: "UPDATE_HOVER_POINT", payload: -1 });
         }
       });
     });
 
+    // To catch user's hovering activity
     board.addEventListener("mousemove", function (x: number, y: number) {
-      const branchNodes: INode[] =
-        selectedColor === "B" ? branchPoints.black : branchPoints.white;
-
-      branchNodes.forEach((branch, i) => {
-        if (branch.x === x && branch.y === y) {
-          dispatch({ type: "UPDATE_HOVER_POINT", payload: i + 1 });
-          return;
-        }
-      });
+      const clickedMove =
+        String.fromCharCode(x) + 97 + String.fromCharCode(y) + 97;
+      // currentMoves.forEach((node) => {
+      //   if (node.move === clickedMove) {
+      //     dispatch({ type: "UPDATE_HOVER_POINT", payload: i + 1 });
+      //     return;
+      //   }
+      // });
     });
 
     return () => {

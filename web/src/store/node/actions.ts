@@ -1,4 +1,4 @@
-import { INode } from "../../types";
+import { INode, IYearlyReChartData } from "../../types";
 import {
   GET_BRANCH_POINTS,
   GET_CURRENT_YEARLY_WIN,
@@ -11,17 +11,17 @@ export const getBranchPoints = (nodes: Array<INode>) => ({
   payload: nodes,
 });
 
-export const getCurrentMoves = (moves: Set<string>) => ({
+export const getCurrentMoves = (moves: Array<INode>) => ({
   type: GET_CURRENT_MOVES,
   payload: moves,
 });
 
-export const getCurrentYearlyWin = (nodes: Array<Object>) => ({
+export const getCurrentYearlyWin = (nodes: Array<IYearlyReChartData>) => ({
   type: GET_CURRENT_YEARLY_WIN,
   payload: nodes,
 });
 
-export const getCurrentYearlyPick = (nodes: Array<Object>) => ({
+export const getCurrentYearlyPick = (nodes: Array<IYearlyReChartData>) => ({
   type: GET_CURRENT_YEARLY_PICK,
   payload: nodes,
 });

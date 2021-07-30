@@ -1,6 +1,6 @@
+// library imports
 import React from "react";
 import {
-  Legend,
   Line,
   LineChart,
   ResponsiveContainer,
@@ -9,19 +9,17 @@ import {
   YAxis,
 } from "recharts";
 
+// local imports
+import { INode } from "../types";
+
 interface ChartProps {
   chartData: object[];
   hoverPoint: string;
   variant: string;
-  moves: Set<string>;
+  moves: Array<INode>;
 }
 
-export const Chart: React.FC<ChartProps> = ({
-  chartData,
-  hoverPoint,
-  moves,
-  variant,
-}) => {
+export const Chart: React.FC<ChartProps> = ({ chartData, moves }) => {
   const arrayMoves = Array.from(moves);
 
   return (
@@ -43,8 +41,8 @@ export const Chart: React.FC<ChartProps> = ({
         {arrayMoves.map((move) => {
           return (
             <Line
-              dataKey={move}
-              key={move}
+              dataKey={move.move}
+              key={move._id}
               type="linear"
               stroke={"#888488"}
               strokeWidth={3}
