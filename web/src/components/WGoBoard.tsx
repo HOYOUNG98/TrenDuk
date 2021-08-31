@@ -44,6 +44,8 @@ export const WGoBoard: React.FC = () => {
       });
     }
 
+    console.log(selectedNodes);
+
     // To catch user's click activity
     board.addEventListener("click", function (x: number, y: number) {
       const clickedMove =
