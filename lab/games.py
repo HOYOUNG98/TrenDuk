@@ -1,17 +1,15 @@
 from selenium import webdriver
-from selenium.common.exceptions import ElementNotInteractableException
-from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import Select
 from pandas import DataFrame
-from selenium.webdriver.support import expected_conditions as EC
-
+from tqdm import tqdm
+from pymongo import MongoClient
 import time
-import csv
 
-START_YEAR = 2006
-NUM_YEAR = 1
+START_YEAR = 2021
+NUM_YEAR = 16
 
-if __name__ == "__main__":
+
+def initialFetch():
     driver = webdriver.Safari()
     driver.get("http://m.baduk.or.kr/record/C01_list.asp#none")
 
@@ -28,16 +26,19 @@ if __name__ == "__main__":
         total = driver.find_element_by_id("lblTotal")
         total = int(total.text.replace(",", ""))
 
-        counter = 0
-        while counter < ((total // 10) + 10):
+        count = len(driver.find_elements_by_class_name("winner"))
+
+        pbar = tqdm(total=total)
+        print("Year {0}".format(START_YEAR - i))
+        while count <= total:
             button = driver.find_element_by_id("AddList")
-            try:
-                button.click()
-                time.sleep(0.5)
-                counter += 1
-            except ElementNotInteractableException:
-                time.sleep(0.5)
-                counter -= 1
+            button.click()
+            time.sleep(2)
+
+            old_count = count
+            count = len(driver.find_elements_by_class_name("winner"))
+            pbar.update(count - old_count)
+        pbar.close()
 
         elems = driver.find_elements_by_class_name("tb-date")
         dates = [elem.text for elem in elems]
@@ -60,12 +61,15 @@ if __name__ == "__main__":
         for j in range(len(dates)):
             data.append([dates[j], winners[j], losers[j]])
         games_df = DataFrame(data, columns=columns)
-        games_df.to_csv(
-            "./data/games/{0}_games.csv".format(START_YEAR - i),
-            index=False,
-            encoding="utf-8-sig",
-            quotechar='"',
-            quoting=csv.QUOTE_ALL,
+        data = games_df.to_dict(orient="records")
+
+        # Insert into database
+        client = MongoClient(
+            "mongodb+srv://kevin4163:ghdi4163@trenduk.sucyo.mongodb.net/games?retryWrites=true&w=majority"
         )
+        collection = client["games"]["{0}_games".format(START_YEAR - i)]
+        collection.insert_many(data)
+
+        driver.refresh()
 
     driver.close()

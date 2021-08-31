@@ -40,6 +40,8 @@ export async function getBranches(
         pickRateData.push(yearlyData2);
       }
 
+      console.log(currentMoves, winRateData, pickRateData);
+
       store.dispatch({
         type: "GET_CURRENT_MOVES",
         payload: currentMoves,
