@@ -1,3 +1,4 @@
+from lab.config import URI
 from selenium import webdriver
 from selenium.webdriver.support.ui import Select
 from pandas import DataFrame
@@ -64,9 +65,7 @@ def initialFetch():
         data = games_df.to_dict(orient="records")
 
         # Insert into database
-        client = MongoClient(
-            "mongodb+srv://kevin4163:ghdi4163@trenduk.sucyo.mongodb.net/games?retryWrites=true&w=majority"
-        )
+        client = MongoClient(URI)
         collection = client["games"]["{0}_games".format(START_YEAR - i)]
         collection.insert_many(data)
 
