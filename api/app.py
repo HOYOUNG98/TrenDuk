@@ -46,14 +46,21 @@ def getGibosBymove():
 @app.route("/getBranches")
 def getBranches():
     filenames = listdir("./data/moves")
+
+    
     depth = request.args.get("depth", default=0, type=int)
     parent = request.args.get("parent", default="root", type=str)
     color = request.args.get("color", default="B", type=str)
+
+    print(depth,parent,color)
 
     branches = []
     filenames.sort()
     for file in filenames:
         nodes_df = read_csv("./data/moves/" + file)
+
+        # change id type to str
+        nodes_df["_id"] = nodes_df["_id"].astype(str)
 
         popular_moves = nodes_df.loc[
             (nodes_df["depth"] == depth) & (nodes_df["parent"]

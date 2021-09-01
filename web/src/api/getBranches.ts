@@ -18,13 +18,21 @@ export async function getBranches(
   })
     .then((response: AxiosResponse) => {
       const responseData: Array<Array<IYearlyNode>> = response.data.branches;
+      console.log(responseData);
       let winRateData: Array<IYearlyReChartData> = [];
       let pickRateData: Array<IYearlyReChartData> = [];
       let currentMoves = Array<INode>();
       for (let i = 0; i < responseData.length; i++) {
         const yearly = responseData[i];
-        let yearlyData1: IYearlyReChartData = { year: yearly[0]["year"] };
-        let yearlyData2: IYearlyReChartData = { year: yearly[0]["year"] };
+        let yearlyData1: IYearlyReChartData;
+        let yearlyData2: IYearlyReChartData;
+        if (yearly.length === 0) {
+          yearlyData1 = { year: 2008 + i };
+          yearlyData2 = { year: 2008 + i };
+        } else {
+          yearlyData1 = { year: yearly[0]["year"] };
+          yearlyData2 = { year: yearly[0]["year"] };
+        }
         for (let j = 0; j < yearly.length; j++) {
           const move = yearly[j];
           yearlyData1[move.move] = move.win_percentage;

@@ -1,7 +1,6 @@
 import { INode } from "../../types";
 
 export interface CurrentState {
-  selectedNode: INode | null;
   selectedNodes: Array<INode>;
   selectedColor: "B" | "W";
   hoverPoint: string;
