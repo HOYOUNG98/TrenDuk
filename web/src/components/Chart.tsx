@@ -1,8 +1,10 @@
 // library imports
 import React from "react";
 import {
+  Bar,
+  CartesianGrid,
+  ComposedChart,
   Line,
-  LineChart,
   ResponsiveContainer,
   Tooltip,
   XAxis,
@@ -10,21 +12,18 @@ import {
 } from "recharts";
 
 // local imports
-import { INode } from "../types";
 
 interface ChartProps {
   chartData: object[];
-  hoverPoint: string;
   variant: string;
-  moves: Array<INode>;
+  move: string;
 }
 
-export const Chart: React.FC<ChartProps> = ({ chartData, moves }) => {
-  const arrayMoves = Array.from(moves);
-
+export const Chart: React.FC<ChartProps> = ({ chartData, move }) => {
+  console.log(chartData, move);
   return (
     <ResponsiveContainer width="100%" height={250}>
-      <LineChart data={chartData} margin={{ top: 20, left: 20, right: 20 }}>
+      <ComposedChart data={chartData} margin={{ top: 20, left: 20, right: 20 }}>
         <Tooltip
           itemSorter={(item) => {
             return (item.value as number) * -1;
@@ -37,19 +36,10 @@ export const Chart: React.FC<ChartProps> = ({ chartData, moves }) => {
             return `${tick}%`;
           }}
         />
-
-        {arrayMoves.map((move) => {
-          return (
-            <Line
-              dataKey={move.move}
-              key={move._id}
-              type="linear"
-              stroke={"#888488"}
-              strokeWidth={3}
-            />
-          );
-        })}
-      </LineChart>
+        <CartesianGrid stroke="#f5f5f5" />
+        <Bar dataKey={move} barSize={20} fill="#413ea0" />
+        <Line type="monotone" dataKey={move} stroke="#ff7300" />
+      </ComposedChart>
     </ResponsiveContainer>
   );
 };
