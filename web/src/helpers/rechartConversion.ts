@@ -1,4 +1,5 @@
 import { INodeStats as INode } from "../store/node/types";
+import { IYearlyReChartData } from "../types";
 
 interface IChartData {
   [key: string]: string | number;
@@ -98,4 +99,23 @@ export const winRateConversion = (
   });
 
   return chartData;
+};
+
+export const ReChartYearlyDataReducer = (
+  objects: IYearlyReChartData[],
+  key: string
+) => {
+  var result: IYearlyReChartData[] = [];
+  objects.forEach((object) => {
+    var newObj: IYearlyReChartData = { year: 0 };
+    if (Object.keys(object).includes(key)) {
+      newObj.year = object.year;
+      newObj[key] = object[key];
+    } else {
+      newObj.year = object.year;
+      newObj[key] = 0;
+    }
+    result.push(newObj);
+  });
+  return result;
 };

@@ -8,7 +8,6 @@ import {
 import { INode } from "../../types";
 
 const initState: CurrentState = {
-  selectedNode: null,
   selectedNodes: [],
   selectedColor: "B",
   hoverPoint: "",
@@ -19,15 +18,13 @@ export const currentReducer = (
   action: CurrentActionType
 ): CurrentState => {
   let selectedNodes: Array<INode>;
-  let selectedNode: INode;
   let selectedColor: "B" | "W";
   let hoverPoint: string;
 
   switch (action.type) {
     case SELECT_NODE:
-      selectedNode = action.payload;
       selectedNodes = [...state.selectedNodes, action.payload];
-      return { ...state, selectedNodes, selectedNode };
+      return { ...state, selectedNodes };
 
     case SELECT_COLOR:
       if (state.selectedColor === "B") {
