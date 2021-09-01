@@ -44,7 +44,14 @@ export const WGoBoard: React.FC = () => {
       });
     }
 
-    console.log(selectedNodes);
+    currentMoves.forEach((node) => {
+      board.addObject({
+        x: node.move[0].charCodeAt(0) - 97,
+        y: node.move[1].charCodeAt(0) - 97,
+        type: "LB",
+        text: "X",
+      });
+    });
 
     // To catch user's click activity
     board.addEventListener("click", function (x: number, y: number) {
@@ -63,14 +70,14 @@ export const WGoBoard: React.FC = () => {
 
     // To catch user's hovering activity
     board.addEventListener("mousemove", function (x: number, y: number) {
-      const clickedMove =
-        String.fromCharCode(x) + 97 + String.fromCharCode(y) + 97;
-      // currentMoves.forEach((node) => {
-      //   if (node.move === clickedMove) {
-      //     dispatch({ type: "UPDATE_HOVER_POINT", payload: i + 1 });
-      //     return;
-      //   }
-      // });
+      const hoveredMove =
+        String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
+      currentMoves.forEach((node) => {
+        if (node.move === hoveredMove) {
+          dispatch({ type: "UPDATE_HOVER_POINT", payload: node.move });
+          return;
+        }
+      });
     });
 
     return () => {
@@ -79,7 +86,7 @@ export const WGoBoard: React.FC = () => {
       ) as HTMLElement;
       boardElement.innerHTML = "";
     };
-  }, [branchPoints, selectedColor]);
+  }, [branchPoints, selectedColor, currentMoves]);
   return <Board ref={refBoard} />;
 };
 
