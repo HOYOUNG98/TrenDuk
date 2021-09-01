@@ -1,4 +1,5 @@
 # library imports
+from lab.config import URI
 from flask import Flask
 from flask_cors import CORS
 from pymongo import MongoClient
@@ -17,7 +18,7 @@ def index():
 
 @app.before_first_request
 def activate_job():
-    client = MongoClient("mongodb+srv://kevin4163:ghdi4163@trenduk.sucyo.mongodb.net/games?retryWrites=true&w=majority")
+    client = MongoClient(URI)
 
     if "games" not in client.list_database_names():
         print("Running inital fetch")
