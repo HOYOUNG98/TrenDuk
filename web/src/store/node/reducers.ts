@@ -1,14 +1,22 @@
+// library imports
+import _ from "lodash";
+
+// local imports
 import {
   GET_BRANCH_POINTS,
-  GET_BRANCH_STATS,
+  GET_CURRENT_YEARLY_WIN,
+  GET_CURRENT_YEARLY_PICK,
   NodeActionType,
   NodeState,
+  GET_CURRENT_MOVES,
 } from "./types";
 import { INode } from "../../types";
 
 const initState: NodeState = {
   branchPoints: { black: [], white: [] },
-  branchStats: { black: [], white: [] },
+  currentMoves: [],
+  currentYearlyWin: [],
+  currentYearlyPick: [],
 };
 
 export const nodeReducer = (
@@ -45,31 +53,24 @@ export const nodeReducer = (
         branchPoints: { black: blackMoves, white: whiteMoves },
       };
 
-    case GET_BRANCH_STATS:
-      var rawNodes: Array<INode> = action.payload;
-      const blackStats = rawNodes
-        .filter((node) => node.color === "B")
-        .map((node) => {
-          return {
-            id: node._id,
-            color: node.color as "B" | "W",
-            yearlyStat: node.yearlyStat,
-          };
-        });
-
-      const whiteStats = rawNodes
-        .filter((node) => node.color === "W")
-        .map((node) => {
-          return {
-            id: node._id,
-            color: node.color as "B" | "W",
-            yearlyStat: node.yearlyStat,
-          };
-        });
-
+    case GET_CURRENT_MOVES:
+      // Remove all duplicates in the list
+      const currentMoves = _.uniqBy(action.payload, "_id");
       return {
         ...state,
-        branchStats: { black: blackStats, white: whiteStats },
+        currentMoves,
+      };
+
+    case GET_CURRENT_YEARLY_WIN:
+      return {
+        ...state,
+        currentYearlyWin: action.payload,
+      };
+
+    case GET_CURRENT_YEARLY_PICK:
+      return {
+        ...state,
+        currentYearlyPick: action.payload,
       };
 
     default:

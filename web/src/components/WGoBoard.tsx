@@ -1,24 +1,24 @@
 // library imports
-import React, { forwardRef, Ref, useEffect, useState } from "react";
+import React, { forwardRef, Ref, useEffect } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { getBranches } from "../api/getBranches";
 
 // local imports
 import { RootState } from "../store";
-import { INodeMoves as INode } from "../store/node/types";
 
 declare const window: any;
 
 export const WGoBoard: React.FC = () => {
-  const [selectedNodes, updateSelectedNodes] = useState<INode[]>([]);
-
-  const { branchPoints, selectedColor } = useSelector(
-    (state: RootState) => ({
-      branchPoints: state.node.branchPoints,
-      selectedColor: state.current.selectedColor,
-    }),
-    shallowEqual
-  );
+  const { branchPoints, selectedColor, selectedNodes, currentMoves } =
+    useSelector(
+      (state: RootState) => ({
+        branchPoints: state.node.branchPoints,
+        selectedColor: state.current.selectedColor,
+        selectedNodes: state.current.selectedNodes,
+        currentMoves: state.node.currentMoves,
+      }),
+      shallowEqual
+    );
 
   const dispatch = useDispatch();
 
@@ -30,6 +30,8 @@ export const WGoBoard: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log(selectedNodes);
+    // Initiate Board
     if (refBoard && refBoard.current) {
       var board = new window.WGo.Board(refBoard.current, {
         width: 500,
@@ -42,47 +44,45 @@ export const WGoBoard: React.FC = () => {
       });
     }
 
-    const branchNodes: INode[] =
-      selectedColor === "B" ? branchPoints.black : branchPoints.white;
-
-    branchNodes.forEach((node, i) => {
+    currentMoves.forEach((node) => {
       board.addObject({
-        x: node.x,
-        y: node.y,
+        x: node.move[0].charCodeAt(0) - 97,
+        y: node.move[1].charCodeAt(0) - 97,
         type: "LB",
-        text: i + 1,
+        text: "X",
       });
     });
 
     selectedNodes.forEach((node) => {
       board.addObject({
-        x: node.x,
-        y: node.y,
+        x: node.move[0].charCodeAt(0) - 97,
+        y: node.move[1].charCodeAt(0) - 97,
         c: node.color === "B" ? window.WGo.B : window.WGo.W,
       });
     });
 
+    // To catch user's click activity
     board.addEventListener("click", function (x: number, y: number) {
-      const branchNodes: INode[] =
-        selectedColor === "B" ? branchPoints.black : branchPoints.white;
+      const clickedMove =
+        String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
 
-      branchNodes.forEach((node) => {
-        if (x === node.x && y === node.y) {
-          getBranches(node.id);
-          updateSelectedNodes([...selectedNodes, node]);
+      currentMoves.forEach((node) => {
+        if (node.move === clickedMove) {
+          var color: "B" | "W" = selectedColor === "W" ? "B" : "W";
+          getBranches(node.depth + 1, node._id, color);
+          dispatch({ type: "SELECT_NODE", payload: node });
           dispatch({ type: "SELECT_COLOR" });
-          dispatch({ type: "UPDATE_HOVER_POINT", payload: -1 });
         }
       });
     });
 
+    // To catch user's hovering activity
     board.addEventListener("mousemove", function (x: number, y: number) {
-      const branchNodes: INode[] =
-        selectedColor === "B" ? branchPoints.black : branchPoints.white;
-
-      branchNodes.forEach((branch, i) => {
-        if (branch.x === x && branch.y === y) {
-          dispatch({ type: "UPDATE_HOVER_POINT", payload: i + 1 });
+      const hoveredMove =
+        String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
+      currentMoves.forEach((node) => {
+        if (node.move === hoveredMove) {
+          dispatch({ type: "UPDATE_HOVER_POINT", payload: node.move });
           return;
         }
       });
@@ -94,7 +94,7 @@ export const WGoBoard: React.FC = () => {
       ) as HTMLElement;
       boardElement.innerHTML = "";
     };
-  }, [branchPoints, selectedColor]);
+  }, [branchPoints, selectedColor, currentMoves]);
   return <Board ref={refBoard} />;
 };
 
