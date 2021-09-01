@@ -1,25 +1,24 @@
 // library imports
-import React, { forwardRef, Ref, useEffect, useState } from "react";
+import React, { forwardRef, Ref, useEffect } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { getBranches } from "../api/getBranches";
 
 // local imports
 import { RootState } from "../store";
-import { INode } from "../types";
 
 declare const window: any;
 
 export const WGoBoard: React.FC = () => {
-  const [selectedNodes, updateSelectedNodes] = useState<INode[]>([]);
-
-  const { branchPoints, selectedColor, currentMoves } = useSelector(
-    (state: RootState) => ({
-      branchPoints: state.node.branchPoints,
-      selectedColor: state.current.selectedColor,
-      currentMoves: state.node.currentMoves,
-    }),
-    shallowEqual
-  );
+  const { branchPoints, selectedColor, selectedNodes, currentMoves } =
+    useSelector(
+      (state: RootState) => ({
+        branchPoints: state.node.branchPoints,
+        selectedColor: state.current.selectedColor,
+        selectedNodes: state.current.selectedNodes,
+        currentMoves: state.node.currentMoves,
+      }),
+      shallowEqual
+    );
 
   const dispatch = useDispatch();
 
@@ -31,6 +30,7 @@ export const WGoBoard: React.FC = () => {
   }, []);
 
   useEffect(() => {
+    console.log(selectedNodes);
     // Initiate Board
     if (refBoard && refBoard.current) {
       var board = new window.WGo.Board(refBoard.current, {
@@ -53,17 +53,25 @@ export const WGoBoard: React.FC = () => {
       });
     });
 
+    selectedNodes.forEach((node) => {
+      board.addObject({
+        x: node.move[0].charCodeAt(0) - 97,
+        y: node.move[1].charCodeAt(0) - 97,
+        c: node.color === "B" ? window.WGo.B : window.WGo.W,
+      });
+    });
+
     // To catch user's click activity
     board.addEventListener("click", function (x: number, y: number) {
       const clickedMove =
         String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
-      console.log(clickedMove, currentMoves);
 
       currentMoves.forEach((node) => {
         if (node.move === clickedMove) {
-          console.log(node);
-          getBranches(1, "7480718411854385318", "W");
-          updateSelectedNodes([...selectedNodes, node]);
+          var color: "B" | "W" = selectedColor === "W" ? "B" : "W";
+          getBranches(node.depth + 1, node._id, color);
+          dispatch({ type: "SELECT_NODE", payload: node });
+          dispatch({ type: "SELECT_COLOR" });
         }
       });
     });

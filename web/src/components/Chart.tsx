@@ -20,7 +20,6 @@ interface ChartProps {
 }
 
 export const Chart: React.FC<ChartProps> = ({ chartData, move }) => {
-  console.log(chartData, move);
   return (
     <ResponsiveContainer width="100%" height={250}>
       <ComposedChart data={chartData} margin={{ top: 20, left: 20, right: 20 }}>
@@ -32,6 +31,7 @@ export const Chart: React.FC<ChartProps> = ({ chartData, move }) => {
         <XAxis dataKey="year" />
         <YAxis
           width={30}
+          domain={[0, 100]}
           tickFormatter={(tick) => {
             return `${tick}%`;
           }}
