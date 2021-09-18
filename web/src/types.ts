@@ -31,7 +31,7 @@ export interface IYearlyNode extends INode {
   year: number;
 }
 
-export interface IYearlyReChartData {
-  year: number;
-  [x: string]: number;
+export interface IReactVisData {
+  x: number;
+  y: number;
 }
