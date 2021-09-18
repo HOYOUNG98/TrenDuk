@@ -1,45 +1,38 @@
 // library imports
 import React from "react";
 import {
-  Bar,
-  CartesianGrid,
-  ComposedChart,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
+  XYPlot,
+  VerticalBarSeries,
+  HorizontalGridLines,
+  VerticalGridLines,
   XAxis,
   YAxis,
-} from "recharts";
+} from "react-vis";
+import { IReactVisData } from "../types";
 
 // local imports
 
 interface ChartProps {
-  chartData: object[];
+  data: Array<IReactVisData>;
   variant: string;
   move: string;
 }
 
-export const Chart: React.FC<ChartProps> = ({ chartData, move }) => {
+export const Chart: React.FC<ChartProps> = ({ data }) => {
   return (
-    <ResponsiveContainer width="100%" height={250}>
-      <ComposedChart data={chartData} margin={{ top: 20, left: 20, right: 20 }}>
-        <Tooltip
-          itemSorter={(item) => {
-            return (item.value as number) * -1;
-          }}
-        />
-        <XAxis dataKey="year" />
-        <YAxis
-          width={30}
-          domain={[0, 100]}
-          tickFormatter={(tick) => {
-            return `${tick}%`;
-          }}
-        />
-        <CartesianGrid stroke="#f5f5f5" />
-        <Bar dataKey={move} barSize={20} fill="#413ea0" />
-        <Line type="monotone" dataKey={move} stroke="#ff7300" />
-      </ComposedChart>
-    </ResponsiveContainer>
+    <div>
+      <XYPlot
+        height={300}
+        width={800}
+        yDomain={[0, 100]}
+        xDomain={[2007.8, 2021.2]}
+      >
+        <VerticalBarSeries data={data} barWidth={0.5} color={"black"} />
+        <XAxis />
+        <YAxis />
+        <HorizontalGridLines />
+        <VerticalGridLines />
+      </XYPlot>
+    </div>
   );
 };

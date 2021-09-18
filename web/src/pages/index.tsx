@@ -8,26 +8,29 @@ import { Chart } from "../components/Chart";
 import { RootState } from "../store";
 import { NavBar } from "../components/NavBar";
 import { HStack, Radio, RadioGroup, Wrap } from "@chakra-ui/react";
-import { IYearlyReChartData } from "../types";
-import { ReChartYearlyDataReducer } from "../helpers/rechartConversion";
+import { ReactVisDataReducer } from "../helpers/rechartConversion";
+import { IReactVisData } from "../types";
 
 const Index: React.FC = () => {
-  const [yearlyPick, yearlyPickUpate] = useState<IYearlyReChartData[]>([]);
-  const [yearlyWin, yearlyWinUpdate] = useState<IYearlyReChartData[]>([]);
+  const [yearlyPick, yearlyPickUpate] = useState<IReactVisData[]>([]);
+  const [yearlyWin, yearlyWinUpdate] = useState<IReactVisData[]>([]);
 
-  const { currentYearlyPick, currentYearlyWin, hoverPoint, selectedColor } =
-    useSelector((state: RootState) => ({
-      currentYearlyPick: state.node.currentYearlyPick,
-      currentYearlyWin: state.node.currentYearlyWin,
+  const { currentMoves, hoverPoint, selectedColor } = useSelector(
+    (state: RootState) => ({
       currentMoves: state.node.currentMoves,
       hoverPoint: state.current.hoverPoint,
       selectedColor: state.current.selectedColor,
-    }));
+    })
+  );
 
   useEffect(() => {
-    yearlyPickUpate(ReChartYearlyDataReducer(currentYearlyPick, hoverPoint));
-    yearlyWinUpdate(ReChartYearlyDataReducer(currentYearlyWin, hoverPoint));
-  }, [hoverPoint, currentYearlyPick, currentYearlyWin]);
+    yearlyPickUpate(
+      ReactVisDataReducer(currentMoves, hoverPoint, "pick_percentage")
+    );
+    yearlyWinUpdate(
+      ReactVisDataReducer(currentMoves, hoverPoint, "win_percentage")
+    );
+  }, [hoverPoint, currentMoves]);
 
   const dispatch = useDispatch();
   return (
@@ -53,8 +56,8 @@ const Index: React.FC = () => {
           </RadioGroup>
         </Wrap>
         <Wrap marginRight="20px">
-          <Chart chartData={yearlyPick} move={hoverPoint} variant={"선택률"} />
-          <Chart chartData={yearlyWin} move={hoverPoint} variant={"승률"} />
+          <Chart data={yearlyPick} move={hoverPoint} variant={"선택률"} />
+          <Chart data={yearlyWin} move={hoverPoint} variant={"승률"} />
         </Wrap>
       </HStack>
     </>
