@@ -33,9 +33,9 @@ export const WGoBoard: React.FC = () => {
       var board = new window.WGo.Board(refBoard.current, {
         width: 500,
         section: {
-          top: -0.5,
+          top: -0.1,
           left: 9,
-          right: -0.5,
+          right: -0.1,
           bottom: 9,
         },
       });
@@ -49,10 +49,10 @@ export const WGoBoard: React.FC = () => {
             this.fillStyle = "rgba(0,0,0,0.7)";
             this.textBaseline = "middle";
             this.textAlign = "center";
-            this.font = board.stoneRadius + "px " + (board.font || "");
+            this.font = "40px " + "sans-serif";
 
-            xleft = board.getX(board.size - 0.25);
-            ytop = board.getY(-0.75);
+            xleft = board.getX(board.size - 0.6);
+            ytop = board.getY(-0.4);
 
             for (var i = 0; i < board.size; i++) {
               ch = i + "A".charCodeAt(0);

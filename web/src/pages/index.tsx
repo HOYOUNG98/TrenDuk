@@ -1,36 +1,26 @@
 // library imports
 import React, { useEffect, useState } from "react";
-import { useSelector, useDispatch } from "react-redux";
+import { useSelector } from "react-redux";
+import { Flex } from "@chakra-ui/react";
 
 // local imports
 import { WGoBoard } from "../components/WGoBoard";
 import { Chart } from "../components/Chart";
 import { RootState } from "../store";
 import { NavBar } from "../components/NavBar";
-import {
-  Box,
-  Flex,
-  Text,
-  HStack,
-  Radio,
-  RadioGroup,
-  VStack,
-  Wrap,
-} from "@chakra-ui/react";
 import { ReactVisDataReducer } from "../helpers/rechartConversion";
 import { IReactVisData } from "../types";
+import { Move } from "../components/Move";
 
 const Index: React.FC = () => {
   const [yearlyPick, yearlyPickUpate] = useState<IReactVisData[]>([]);
   const [yearlyWin, yearlyWinUpdate] = useState<IReactVisData[]>([]);
+  const [uniqueMoves, uniqueMovesupdate] = useState<string[]>([]);
 
-  const { currentMoves, hoverPoint, selectedColor } = useSelector(
-    (state: RootState) => ({
-      currentMoves: state.node.currentMoves,
-      hoverPoint: state.current.hoverPoint,
-      selectedColor: state.current.selectedColor,
-    })
-  );
+  const { currentMoves, hoverPoint } = useSelector((state: RootState) => ({
+    currentMoves: state.node.currentMoves,
+    hoverPoint: state.current.hoverPoint,
+  }));
 
   useEffect(() => {
     yearlyPickUpate(
@@ -40,6 +30,11 @@ const Index: React.FC = () => {
       ReactVisDataReducer(currentMoves, hoverPoint, "win_percentage")
     );
   }, [hoverPoint, currentMoves]);
+
+  useEffect(() => {
+    const unique = [...new Set(currentMoves.map((item) => item.move))];
+    uniqueMovesupdate(unique);
+  }, [currentMoves]);
 
   return (
     <Flex direction="column">
@@ -57,47 +52,12 @@ const Index: React.FC = () => {
           width={["100%", "160px", "160px", "160px"]}
           height={["100px", "500px", "500px", "500px"]}
           direction={["row", "row", "column", "column"]}
+          marginRight={"10px"}
           overflowX="auto"
         >
-          <Box borderWidth="1px" height="100px" width="160px" borderRadius="lg">
-            <Text fontSize="xl">MOVE</Text>
-            <Text fontSize="medium">Description</Text>
-          </Box>
-
-          <Box borderWidth="1px" height="100px" width="160px" borderRadius="lg">
-            <Text fontSize="large">MOVE</Text>
-            <Text fontSize="medium">Description</Text>
-          </Box>
-
-          <Box borderWidth="1px" height="100px" width="160px" borderRadius="lg">
-            <Text fontSize="large">MOVE</Text>
-            <Text fontSize="medium">Description</Text>
-          </Box>
-          <Box borderWidth="1px" height="100px" width="160px" borderRadius="lg">
-            <Text fontSize="large">MOVE</Text>
-            <Text fontSize="medium">Description</Text>
-          </Box>
-          <Box borderWidth="1px" height="100px" width="160px" borderRadius="lg">
-            <Text fontSize="large">MOVE</Text>
-            <Text fontSize="medium">Description</Text>
-          </Box>
-          <Box borderWidth="1px" height="100px" width="160px" borderRadius="lg">
-            <Text fontSize="large">MOVE</Text>
-            <Text fontSize="medium">Description</Text>
-          </Box>
-          <Box borderWidth="1px" height="100px" width="160px" borderRadius="lg">
-            <Text fontSize="large">MOVE</Text>
-            <Text fontSize="medium">Description</Text>
-          </Box>
-          <Box
-            borderWidth="1px"
-            height="100px"
-            width="160pxs"
-            borderRadius="lg"
-          >
-            <Text fontSize="large">MOVE</Text>
-            <Text fontSize="medium">Description</Text>
-          </Box>
+          {uniqueMoves.map((move) => {
+            return <Move move={move} pick={50} win={50} />;
+          })}
         </Flex>
         {/* Board */}
         <WGoBoard />
@@ -106,6 +66,7 @@ const Index: React.FC = () => {
           width={["100%", "40%", "40%", "40%"]}
           height={["100px", "500px", "500px", "500px"]}
           direction={["row", "row", "column", "column"]}
+          MarginLeft={"10px"}
           overflow="auto"
         >
           <Chart
