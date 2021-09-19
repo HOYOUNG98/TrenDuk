@@ -21,6 +21,7 @@
     "recharts": "^2.1.2",
     "redux": "^4.1.1",
     "redux-devtools-extension": "^2.13.9",
+    "react-vis": "^1.11.7",
     "redux-thunk": "^2.3.0"
   },
   "license": "MIT",
@@ -28,6 +29,7 @@
     "@types/axios": "^0.14.0",
     "@types/node": "^16.7.10",
     "@types/react-redux": "^7.1.18",
+    "@types/react-vis": "^1.11.7",
     "typescript": "^4.4.2"
   }
 }

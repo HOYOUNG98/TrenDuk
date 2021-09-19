@@ -9,16 +9,14 @@ import { RootState } from "../store";
 declare const window: any;
 
 export const WGoBoard: React.FC = () => {
-  const { branchPoints, selectedColor, selectedNodes, currentMoves } =
-    useSelector(
-      (state: RootState) => ({
-        branchPoints: state.node.branchPoints,
-        selectedColor: state.current.selectedColor,
-        selectedNodes: state.current.selectedNodes,
-        currentMoves: state.node.currentMoves,
-      }),
-      shallowEqual
-    );
+  const { selectedColor, selectedNodes, currentMoves } = useSelector(
+    (state: RootState) => ({
+      selectedColor: state.current.selectedColor,
+      selectedNodes: state.current.selectedNodes,
+      currentMoves: state.node.currentMoves,
+    }),
+    shallowEqual
+  );
 
   const dispatch = useDispatch();
 
@@ -30,25 +28,55 @@ export const WGoBoard: React.FC = () => {
   }, []);
 
   useEffect(() => {
-    console.log(selectedNodes);
     // Initiate Board
     if (refBoard && refBoard.current) {
       var board = new window.WGo.Board(refBoard.current, {
         width: 500,
         section: {
-          top: 0,
+          top: -0.1,
           left: 9,
-          right: 0,
+          right: -0.1,
           bottom: 9,
         },
       });
+
+      var coordinates = {
+        // draw on grid layer
+        grid: {
+          draw: function (this: any, _: any, board: any) {
+            var ch, t, xleft, ytop;
+
+            this.fillStyle = "rgba(0,0,0,0.7)";
+            this.textBaseline = "middle";
+            this.textAlign = "center";
+            this.font = "40px " + "sans-serif";
+
+            xleft = board.getX(board.size - 0.6);
+            ytop = board.getY(-0.4);
+
+            for (var i = 0; i < board.size; i++) {
+              ch = i + "A".charCodeAt(0);
+              if (ch >= "I".charCodeAt(0)) ch++;
+
+              t = board.getY(i);
+              this.fillText(i + 1, xleft, t);
+
+              t = board.getX(i);
+              this.fillText(String.fromCharCode(ch - 1), t, ytop);
+            }
+
+            this.fillStyle = "black";
+          },
+        },
+      };
+      board.addCustomObject(coordinates);
     }
 
     currentMoves.forEach((node) => {
       board.addObject({
         x: node.move[0].charCodeAt(0) - 97,
-        y: node.move[1].charCodeAt(0) - 97,
-        type: "LB",
+        y: +node.move.slice(1) - 1,
+        type: "MA",
         text: "X",
       });
     });
@@ -56,15 +84,14 @@ export const WGoBoard: React.FC = () => {
     selectedNodes.forEach((node) => {
       board.addObject({
         x: node.move[0].charCodeAt(0) - 97,
-        y: node.move[1].charCodeAt(0) - 97,
+        y: +node.move.slice(1) - 1,
         c: node.color === "B" ? window.WGo.B : window.WGo.W,
       });
     });
 
     // To catch user's click activity
     board.addEventListener("click", function (x: number, y: number) {
-      const clickedMove =
-        String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
+      const clickedMove = String.fromCharCode(x + 97) + (y + 1);
 
       currentMoves.forEach((node) => {
         if (node.move === clickedMove) {
@@ -78,8 +105,8 @@ export const WGoBoard: React.FC = () => {
 
     // To catch user's hovering activity
     board.addEventListener("mousemove", function (x: number, y: number) {
-      const hoveredMove =
-        String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
+      const hoveredMove = String.fromCharCode(x + 97) + (y + 1);
+
       currentMoves.forEach((node) => {
         if (node.move === hoveredMove) {
           dispatch({ type: "UPDATE_HOVER_POINT", payload: node.move });
@@ -94,7 +121,7 @@ export const WGoBoard: React.FC = () => {
       ) as HTMLElement;
       boardElement.innerHTML = "";
     };
-  }, [branchPoints, selectedColor, currentMoves]);
+  }, [selectedColor, currentMoves]);
   return <Board ref={refBoard} />;
 };
 

@@ -29,9 +29,12 @@ export interface IYearlyNode extends INode {
   pick_percentage: number;
   win_percentage: number;
   year: number;
+  num_win: number;
+  num_data: number;
+  num_total: number;
 }
 
-export interface IYearlyReChartData {
-  year: number;
-  [x: string]: number;
+export interface IReactVisData {
+  x: number;
+  y: number;
 }
