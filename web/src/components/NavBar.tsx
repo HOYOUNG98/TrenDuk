@@ -7,7 +7,7 @@ interface NavBarProps {}
 
 export const NavBar: React.FC<NavBarProps> = ({}) => {
   return (
-    <Flex boxShadow="0 2px 8px #f0f1f2" p={4}>
+    <Flex boxShadow="0 2px 8px #f0f1f2" p={4} height="50px">
       <Box fontSize="1.2em">Trenduk</Box>
       <Box ml={"auto"}>
         <Link isExternal href="https://github.com/HOYOUNG98/TrenDuk">
