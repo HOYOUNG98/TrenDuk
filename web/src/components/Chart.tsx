@@ -37,12 +37,7 @@ export const Chart: React.FC<ChartProps> = ({ data, variant }) => {
         <YAxis />
         <HorizontalGridLines />
         <VerticalGridLines />
-        <LineSeries
-          animation={{ damping: 10, stiffness: 40 }}
-          data={data}
-          color={"black"}
-          style={{ strokeWidth: 4 }}
-        />
+        <LineSeries data={data} color={"black"} style={{ strokeWidth: 4 }} />
         <AreaSeries data={data} color={"rgba(188, 185, 185, 0.6)"} />
         <LineSeries
           data={referenceData}

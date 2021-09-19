@@ -75,8 +75,8 @@ export const WGoBoard: React.FC = () => {
     currentMoves.forEach((node) => {
       board.addObject({
         x: node.move[0].charCodeAt(0) - 97,
-        y: node.move[1].charCodeAt(0) - 97,
-        type: "outline",
+        y: +node.move.slice(1) - 1,
+        type: "MA",
         text: "X",
       });
     });
@@ -84,15 +84,14 @@ export const WGoBoard: React.FC = () => {
     selectedNodes.forEach((node) => {
       board.addObject({
         x: node.move[0].charCodeAt(0) - 97,
-        y: node.move[1].charCodeAt(0) - 97,
+        y: +node.move.slice(1) - 1,
         c: node.color === "B" ? window.WGo.B : window.WGo.W,
       });
     });
 
     // To catch user's click activity
     board.addEventListener("click", function (x: number, y: number) {
-      const clickedMove =
-        String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
+      const clickedMove = String.fromCharCode(x + 97) + (y + 1);
 
       currentMoves.forEach((node) => {
         if (node.move === clickedMove) {
@@ -106,8 +105,8 @@ export const WGoBoard: React.FC = () => {
 
     // To catch user's hovering activity
     board.addEventListener("mousemove", function (x: number, y: number) {
-      const hoveredMove =
-        String.fromCharCode(x + 97) + String.fromCharCode(y + 97);
+      const hoveredMove = String.fromCharCode(x + 97) + (y + 1);
+
       currentMoves.forEach((node) => {
         if (node.move === hoveredMove) {
           dispatch({ type: "UPDATE_HOVER_POINT", payload: node.move });

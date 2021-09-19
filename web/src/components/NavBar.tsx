@@ -8,7 +8,7 @@ export const NavBar: React.FC<NavBarProps> = ({}) => {
   return (
     <Flex
       background="black"
-      height="50px"
+      minHeight={["40px", "40px", "50px", "50px"]}
       alignItems="center"
       justifyContent="center"
     >

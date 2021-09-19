@@ -41,33 +41,38 @@ const Index: React.FC = () => {
       <NavBar />
       <Flex
         width="100%"
-        height="100%"
-        marginTop="-50px"
+        height={["", "", "100%", "100%"]}
+        marginTop={["40px", "40px", "-50px", "-50px"]}
         justifyContent="center"
         alignItems="center"
         direction={["column", "column", "row", "row"]}
       >
         {/* Moves List */}
         <Flex
-          width={["100%", "160px", "160px", "160px"]}
-          height={["100px", "500px", "500px", "500px"]}
+          width={["500px", "500px", "160px", "160px"]}
+          height={["80px", "80px", "500px", "500px"]}
           direction={["row", "row", "column", "column"]}
-          marginRight={"10px"}
-          overflowX="auto"
+          marginRight={["0", "0", "10px", "10px"]}
+          marginBottom={{ base: "10px" }}
+          overflowX={{ base: "auto" }}
+          overflowY={{ md: "auto" }}
+          overflow="auto"
         >
           {uniqueMoves.map((move) => {
-            return <Move move={move} pick={50} win={50} />;
+            return <Move move={move} pick={50} win={50} key={move} />;
           })}
         </Flex>
         {/* Board */}
         <WGoBoard />
         {/* Charts */}
         <Flex
-          width={["100%", "40%", "40%", "40%"]}
-          height={["100px", "500px", "500px", "500px"]}
+          width={["500px", "500px", "40%", "40%"]}
+          height={["500px", "500px", "500px", "500px"]}
           direction={["row", "row", "column", "column"]}
-          MarginLeft={"10px"}
-          overflow="auto"
+          marginTop={{ base: "10px" }}
+          overflowY={{ base: "auto" }}
+          marginLeft={{ md: "10px" }}
+          overflowX={{ md: "auto" }}
         >
           <Chart
             data={yearlyPick}
