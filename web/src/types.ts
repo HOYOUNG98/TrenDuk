@@ -29,6 +29,9 @@ export interface IYearlyNode extends INode {
   pick_percentage: number;
   win_percentage: number;
   year: number;
+  num_win: number;
+  num_data: number;
+  num_total: number;
 }
 
 export interface IReactVisData {
