@@ -1,45 +1,69 @@
 // library imports
 import React from "react";
 import {
-  Bar,
-  CartesianGrid,
-  ComposedChart,
-  Line,
-  ResponsiveContainer,
-  Tooltip,
+  HorizontalGridLines,
+  VerticalGridLines,
   XAxis,
   YAxis,
-} from "recharts";
+  FlexibleWidthXYPlot,
+  LineSeries,
+  ChartLabel,
+  AreaSeries,
+} from "react-vis";
+import "react-vis/dist/style.css";
 
 // local imports
+import { IReactVisData } from "../types";
 
 interface ChartProps {
-  chartData: object[];
+  data: Array<IReactVisData>;
   variant: string;
   move: string;
 }
 
-export const Chart: React.FC<ChartProps> = ({ chartData, move }) => {
+const referenceData = [...Array(14).keys()].map((i) => {
+  return { x: 2008 + i, y: 50 };
+});
+
+export const Chart: React.FC<ChartProps> = ({ data, variant }) => {
   return (
-    <ResponsiveContainer width="100%" height={250}>
-      <ComposedChart data={chartData} margin={{ top: 20, left: 20, right: 20 }}>
-        <Tooltip
-          itemSorter={(item) => {
-            return (item.value as number) * -1;
+    <div>
+      <FlexibleWidthXYPlot
+        height={300}
+        yDomain={[0, 100]}
+        xDomain={[2008, 2021]}
+      >
+        <XAxis />
+        <YAxis />
+        <HorizontalGridLines />
+        <VerticalGridLines />
+        <LineSeries data={data} color={"black"} style={{ strokeWidth: 4 }} />
+        <AreaSeries data={data} color={"rgba(188, 185, 185, 0.6)"} />
+        <LineSeries
+          data={referenceData}
+          color={"8f8f8f"}
+          strokeStyle={"dashed"}
+        />
+        <ChartLabel
+          text="Year"
+          className="alt-x-label"
+          includeMargin={false}
+          xPercent={0.025}
+          yPercent={1.01}
+        />
+
+        <ChartLabel
+          text={variant}
+          className="alt-y-label"
+          includeMargin={false}
+          xPercent={0.03}
+          yPercent={0.06}
+          style={{
+            transform: "rotate(-90)",
+            textAnchor: "end",
           }}
         />
-        <XAxis dataKey="year" />
-        <YAxis
-          width={30}
-          domain={[0, 100]}
-          tickFormatter={(tick) => {
-            return `${tick}%`;
-          }}
-        />
-        <CartesianGrid stroke="#f5f5f5" />
-        <Bar dataKey={move} barSize={20} fill="#413ea0" />
-        <Line type="monotone" dataKey={move} stroke="#ff7300" />
-      </ComposedChart>
-    </ResponsiveContainer>
+      </FlexibleWidthXYPlot>
+    </div>
   );
 };

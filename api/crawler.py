@@ -1,8 +1,10 @@
+from os import listdir
 from typing import List
 import requests
 from bs4 import BeautifulSoup
 from pandas import DataFrame, read_csv
 import csv
+from tqdm import tqdm
 
 
 def request(link: str):
@@ -113,6 +115,7 @@ def parseGame(link: str):
     gibo["link"] = link
     moves = moves[:end_parenthesis]
     moves = moves.replace("[", "").replace("]", "")
+    moves = moves[0] + str(ord(moves[1]) - 97)
     gibo["moves"] = moves
 
     # Comments in moves messes up data
@@ -123,32 +126,47 @@ def parseGame(link: str):
 
 
 if __name__ == "__main__":
-    original_df = read_csv('default_games.csv')
-    latest_link = original_df.iloc[0]["link"]
-    gibo_dict = {}
-    for page in range(1, 800):
-        link = "https://www.cyberoro.com/bcast/gibo.oro?param=1&div=1&Tdiv=B&Sdiv=2&pageNo={0}&blockNo=1".format(
-            page)
-        links = parsePage(link, latest_link)
+    # original_df = read_csv('default_games.csv')
+    # latest_link = original_df.iloc[0]["link"]
+    # gibo_dict = {}
+    # for page in tqdm(range(1, 800)):
+    #     link = "https://www.cyberoro.com/bcast/gibo.oro?param=1&div=1&Tdiv=B&Sdiv=2&pageNo={0}&blockNo=1".format(
+    #         page)
+    #     links = parsePage(link, latest_link)
 
-        for link in links:
-            gibo = parseGame(link)
-            if gibo:
-                if "date" not in gibo.keys():
-                    continue
-                year = gibo["date"][:4]
-                if year not in gibo_dict.keys():
-                    gibo_dict[year] = [gibo]
-                else:
-                    gibo_dict[year].append(gibo)
-            else:
-                continue
+    #     for link in links:
+    #         gibo = parseGame(link)
+    #         if gibo:
+    #             if "date" not in gibo.keys():
+    #                 continue
+    #             year = gibo["date"][:4]
+    #             if year not in gibo_dict.keys():
+    #                 gibo_dict[year] = [gibo]
+    #             else:
+    #                 gibo_dict[year].append(gibo)
+    #         else:
+    #             continue
 
-        # Prevent duplicates
-        if len(links) != 20:
-            break
+    #     # Prevent duplicates
+    #     if len(links) != 20:
+    #         break
 
-    for key in gibo_dict.keys():
-        gibo_df = DataFrame(gibo_dict[key])
-        gibo_df.to_csv("./data/{}_cyberoro_games.csv".format(key), index=False,
-                       encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
+    # for key in gibo_dict.keys():
+    #     gibo_df = DataFrame(gibo_dict[key])
+    #     gibo_df.to_csv("./data/test_{}_cyberoro_games.csv".format(key), index=False,
+    #                    encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
+    original_df = read_csv("cyberoro_games.csv")
+
+    filenames = listdir("./data/moves")
+
+    def fixMove(move):
+        return move[0] + str(ord(move[1])-96)
+
+    for file in filenames:
+        nodes_df = read_csv("./data/moves/" + file)
+        print(nodes_df["move"])
+
+        nodes_df["move"] = nodes_df["move"].apply(fixMove)
+
+        nodes_df.to_csv("./data/moves/{}".format(file), index=False,
+                        encoding="utf-8-sig", quotechar='"', quoting=csv.QUOTE_ALL)
