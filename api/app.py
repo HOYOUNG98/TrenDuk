@@ -13,8 +13,8 @@ app = Flask(__name__)
 CORS(app)
 
 # Initialize database...?
-games_df = read_csv("cyberoro_games.csv")
-nodes_df = read_csv("cyberoro_nodes.csv")
+games_df = read_csv("./data/games/cyberoro_games.csv")
+nodes_df = read_csv("./data/moves/cyberoro_nodes.csv")
 
 
 @app.route("/")
@@ -50,8 +50,6 @@ def getBranches():
     parent = request.args.get("parent", default="root", type=str)
     color = request.args.get("color", default="B", type=str)
 
-    print(depth, parent, color)
-
     branches = []
     filenames.sort()
     for file in filenames:
@@ -72,7 +70,7 @@ def getBranches():
         popular_moves["pick_percentage"] = round(popular_moves["num_data"] / popular_moves["num_total"] * 100, 1)
 
         popular_moves = popular_moves.loc[popular_moves["num_data"] > 10]
-        popular_moves = popular_moves.drop(columns=["link", "num_data", "num_win", "num_total", "parent"])
+        popular_moves = popular_moves.drop(columns=["link", "parent"])
         popular_moves["year"] = file[:4]
 
         branches.append(popular_moves.to_dict("records"))
@@ -93,7 +91,6 @@ def updateGames():
     for page in range(1, 800):
         link = "https://www.cyberoro.com/bcast/gibo.oro?param=1&div=1&Tdiv=B&Sdiv=2&pageNo={0}&blockNo=1".format(page)
         links = parsePage(link, latest_link)
-        print(len(links))
 
         for link in links:
             gibo = parseGame(link)
@@ -115,7 +112,6 @@ def updateGames():
 
     for gibo in gibo_list:
         moves = gibo["move"].split(";")
-        print(assortCorners(moves))
 
 
 if __name__ == "__main__":

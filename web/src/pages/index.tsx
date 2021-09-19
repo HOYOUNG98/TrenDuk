@@ -12,10 +12,17 @@ import { ReactVisDataReducer } from "../helpers/rechartConversion";
 import { IReactVisData } from "../types";
 import { Move } from "../components/Move";
 
+interface IMoveData {
+  move: string;
+  numWin: number;
+  numData: number;
+  numTotal: number;
+}
+
 const Index: React.FC = () => {
   const [yearlyPick, yearlyPickUpate] = useState<IReactVisData[]>([]);
   const [yearlyWin, yearlyWinUpdate] = useState<IReactVisData[]>([]);
-  const [uniqueMoves, uniqueMovesupdate] = useState<string[]>([]);
+  const [uniqueMoves, uniqueMovesupdate] = useState<IMoveData[]>([]);
 
   const { currentMoves, hoverPoint } = useSelector((state: RootState) => ({
     currentMoves: state.node.currentMoves,
@@ -33,7 +40,21 @@ const Index: React.FC = () => {
 
   useEffect(() => {
     const unique = [...new Set(currentMoves.map((item) => item.move))];
-    uniqueMovesupdate(unique);
+    var uniqueMoves: Array<IMoveData> = unique.map((move) => {
+      const obj = { move, numWin: 0, numData: 0, numTotal: 0 };
+      return obj;
+    });
+    currentMoves.forEach((move) => {
+      uniqueMoves.forEach((unique) => {
+        if (unique.move === move.move) {
+          unique.numWin += move.num_win;
+          unique.numData += move.num_data;
+          unique.numTotal += move.num_total;
+        }
+      });
+    });
+
+    uniqueMovesupdate(uniqueMoves);
   }, [currentMoves]);
 
   return (
@@ -53,13 +74,20 @@ const Index: React.FC = () => {
           height={["80px", "80px", "500px", "500px"]}
           direction={["row", "row", "column", "column"]}
           marginRight={["0", "0", "10px", "10px"]}
-          marginBottom={{ base: "10px" }}
+          marginBottom={["10px", "10px", "0", "0"]}
           overflowX={{ base: "auto" }}
           overflowY={{ md: "auto" }}
           overflow="auto"
         >
           {uniqueMoves.map((move) => {
-            return <Move move={move} pick={50} win={50} key={move} />;
+            return (
+              <Move
+                move={move.move}
+                pick={+((move.numData / move.numTotal) * 100).toFixed(2)}
+                win={+((move.numWin / move.numData) * 100).toFixed(2)}
+                key={move.move}
+              />
+            );
           })}
         </Flex>
         {/* Board */}
@@ -67,9 +95,9 @@ const Index: React.FC = () => {
         {/* Charts */}
         <Flex
           width={["500px", "500px", "40%", "40%"]}
-          height={["500px", "500px", "500px", "500px"]}
+          height={["300px", "300px", "500px", "500px"]}
           direction={["row", "row", "column", "column"]}
-          marginTop={{ base: "10px" }}
+          marginTop={["10px", "10px", "0", "0"]}
           overflowY={{ base: "auto" }}
           marginLeft={{ md: "10px" }}
           overflowX={{ md: "auto" }}
