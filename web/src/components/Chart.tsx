@@ -8,9 +8,7 @@ import {
   FlexibleWidthXYPlot,
   LineSeries,
   ChartLabel,
-  AreaSeries,
 } from "react-vis";
-import "react-vis/dist/style.css";
 
 // local imports
 import { IReactVisData } from "../types";
@@ -37,8 +35,7 @@ export const Chart: React.FC<ChartProps> = ({ data, variant }) => {
         <YAxis />
         <HorizontalGridLines />
         <VerticalGridLines />
-        <LineSeries data={data} color={"black"} style={{ strokeWidth: 4 }} />
-        <AreaSeries data={data} color={"rgba(188, 185, 185, 0.6)"} />
+        <LineSeries data={data} color={"black"} style={{ strokeWidth: 1 }} />
         <LineSeries
           data={referenceData}
           color={"8f8f8f"}

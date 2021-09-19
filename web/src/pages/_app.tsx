@@ -5,6 +5,7 @@ import { Provider } from "react-redux";
 // local import
 import theme from "../theme";
 import { store } from "../store";
+import "react-vis/dist/style.css";
 
 function MyApp({ Component, pageProps }: any) {
   return (
