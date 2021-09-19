@@ -63,7 +63,7 @@ const Index: React.FC = () => {
       <Flex
         width="100%"
         height={["", "", "100%", "100%"]}
-        marginTop={["40px", "40px", "-50px", "-50px"]}
+        marginTop={["40px", "40px", "50px", "50px"]}
         justifyContent="center"
         alignItems="center"
         direction={["column", "column", "row", "row"]}
