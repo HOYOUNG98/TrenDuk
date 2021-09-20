@@ -12,7 +12,7 @@ export async function getBranches(
 ) {
   await axios({
     method: "GET",
-    url: "getBranches",
+    url: "api/getBranches",
     baseURL: process.env.NEXT_PUBLIC_API_URL,
     params: { depth, parent, color },
   })
