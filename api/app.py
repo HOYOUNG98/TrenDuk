@@ -10,7 +10,7 @@ from crawler import parseGame, parsePage
 from analyzer import assortCorners
 
 app = Flask(__name__)
-CORS(app)
+cors = CORS(app, resources={r"/api/*": {"origins": "*"}})
 
 # Initialize database...?
 games_df = read_csv("./data/games/cyberoro_games.csv")
@@ -42,7 +42,7 @@ def getGibosBymove():
     return {"status": 200, "gibos": gibos}
 
 
-@app.route("/getBranches")
+@app.route("/api/getBranches")
 def getBranches():
     filenames = listdir("./data/moves")
 
