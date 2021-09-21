@@ -1,22 +1,6 @@
-# library imports
-from flask import Flask, request
-from flask_cors import CORS
-from pandas import read_csv
-from os import listdir
-
-
-def create_app():
-    print("Working...?")
-    app = Flask(__name__)
-    CORS(app)
-
-    @app.route('/')
-    def hello_world():
-        return 'Hello, World!'
-
-    @app.route('/getBranches')
-    def getBrances():
-        filenames = listdir("./data/moves")
+class GetBranchesAPI(Resource):
+    def get():
+        filenames = listdir("../../data/moves")
 
         depth = request.args.get("depth", default=0, type=int)
         parent = request.args.get("parent", default="root", type=str)
@@ -51,11 +35,3 @@ def create_app():
             return {"status": 200, "message": "no moves meets given criteria"}
 
         return {"status": 200, "branches": branches}
-
-    return app
-
-        
-
-if __name__ == "__main__":
-    app = create_app()
-    app.run(host='0.0.0.0', debug=True)
