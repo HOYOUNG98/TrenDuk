@@ -4,7 +4,6 @@ import requests
 from bs4 import BeautifulSoup
 from pandas import DataFrame, read_csv
 import csv
-from tqdm import tqdm
 
 
 def request(link: str):

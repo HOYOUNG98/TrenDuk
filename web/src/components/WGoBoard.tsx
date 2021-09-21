@@ -1,4 +1,5 @@
 // library imports
+import { useBreakpointValue } from "@chakra-ui/react";
 import React, { forwardRef, Ref, useEffect } from "react";
 import { shallowEqual, useDispatch, useSelector } from "react-redux";
 import { getBranches } from "../api/getBranches";
@@ -9,6 +10,7 @@ import { RootState } from "../store";
 declare const window: any;
 
 export const WGoBoard: React.FC = () => {
+  const variant: any = useBreakpointValue({ base: 300, lg: 500 });
   const { selectedColor, selectedNodes, currentMoves } = useSelector(
     (state: RootState) => ({
       selectedColor: state.current.selectedColor,
@@ -31,7 +33,7 @@ export const WGoBoard: React.FC = () => {
     // Initiate Board
     if (refBoard && refBoard.current) {
       var board = new window.WGo.Board(refBoard.current, {
-        width: 500,
+        width: variant,
         section: {
           top: -0.1,
           left: 9,
@@ -49,7 +51,7 @@ export const WGoBoard: React.FC = () => {
             this.fillStyle = "rgba(0,0,0,0.7)";
             this.textBaseline = "middle";
             this.textAlign = "center";
-            this.font = "40px " + "sans-serif";
+            this.font = `${variant / 10}` + "px " + "sans-serif";
 
             xleft = board.getX(board.size - 0.6);
             ytop = board.getY(-0.4);
@@ -121,7 +123,7 @@ export const WGoBoard: React.FC = () => {
       ) as HTMLElement;
       boardElement.innerHTML = "";
     };
-  }, [selectedColor, currentMoves]);
+  }, [selectedColor, currentMoves, variant]);
   return <Board ref={refBoard} />;
 };
 
