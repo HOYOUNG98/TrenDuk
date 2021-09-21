@@ -1,15 +1,17 @@
-FROM python:3.8-slim-buster
+FROM python:3.8
 
-WORKDIR /usr/src/app
+WORKDIR /app
 
 COPY requirements.txt requirements.txt
 RUN pip3 install -r requirements.txt
 
 COPY . .
 
+RUN pip3 install gunicorn
+
 ENV FLASK_APP app
 ENV FLASK_ENV production
 
 EXPOSE 5000
 
-CMD [ "python3", "app.py"]
+CMD ["gunicorn"  , "-b", "0.0.0.0:5000", "wsgi:app"]
