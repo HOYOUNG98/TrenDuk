@@ -70,7 +70,7 @@ const Index: React.FC = () => {
       >
         {/* Moves List */}
         <Flex
-          width={["500px", "500px", "160px", "160px"]}
+          width={["300px", "500px", "160px", "160px"]}
           height={["80px", "80px", "500px", "500px"]}
           direction={["row", "row", "column", "column"]}
           marginRight={["0", "0", "10px", "10px"]}
@@ -94,8 +94,8 @@ const Index: React.FC = () => {
         <WGoBoard />
         {/* Charts */}
         <Flex
-          width={["500px", "500px", "40%", "40%"]}
-          height={["300px", "300px", "500px", "500px"]}
+          width={["300px", "500px", "40%", "40%"]}
+          height={["200px", "200px", "500px", "500px"]}
           direction={["row", "row", "column", "column"]}
           marginTop={["10px", "10px", "0", "0"]}
           overflowY={{ base: "auto" }}

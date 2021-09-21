@@ -1,4 +1,5 @@
 // library imports
+import { useBreakpointValue } from "@chakra-ui/react";
 import React from "react";
 import {
   HorizontalGridLines,
@@ -24,10 +25,12 @@ const referenceData = [...Array(14).keys()].map((i) => {
 });
 
 export const Chart: React.FC<ChartProps> = ({ data, variant }) => {
+  const height: any = useBreakpointValue({ base: 200, lg: 300 });
+
   return (
     <div>
       <FlexibleWidthXYPlot
-        height={300}
+        height={height}
         yDomain={[0, 100]}
         xDomain={[2008, 2021]}
       >
