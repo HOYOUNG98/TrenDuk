@@ -1,4 +1,6 @@
 from __future__ import annotations
+from type import TreeNode
+from os import listdir
 
 class Parser:
     @staticmethod
@@ -15,3 +17,100 @@ class Parser:
 
         return res[0], res[1:]
 
+    @staticmethod
+    def parse_sequence(sequence: list[str], game: str) -> dict:
+        
+        res: dict = {}
+        sequence = Parser.align_sequence(sequence)
+        # game_instance = GameInfo()
+        root = TreeNode.root()
+
+        for idx, move in enumerate(sequence):
+            color, coordinate, game_depth = move[0], move[2:4], move[5:]
+            move_instance = TreeNode(coordinate, color, idx+1, int(game_depth), 1)
+            root.addChild(move_instance.id)
+            root = move_instance
+
+            res[move_instance.id] = move_instance
+
+        return res
+    
+    @staticmethod
+    def divide_sequences(moves: list[str]) -> list[list[str]]:
+        top_left = []
+        top_right = []
+        bottom_left = []
+        bottom_right = []
+
+        # Skip the root node which has general information of game.
+        # Start looking at moves.
+        for idx, move in enumerate(moves):
+
+            x, y = move[2:4][0], move[2:4][1]
+            depth = str(idx+1)
+
+            if x < 'i' and y < 'i':
+                top_left.append(move + depth)
+            elif x < 'i' and y > 'i':
+                bottom_left.append(move + depth)
+            elif x > 'i' and y < 'i':
+                top_right.append(move + depth)
+            elif x > 'i' and y > 'i':
+                bottom_right.append(move + depth)
+
+        return [top_left, bottom_left, top_right, bottom_right]
+    
+    @staticmethod
+    def align_sequence(sequence: list[str]) -> list[str]:
+        first_move = sequence[0]
+        first_move_x, first_move_y = first_move[2:4][0], first_move[2:4][1]
+
+        # Allow sequence to be in top right corner
+        if first_move_x > 'i' or first_move_y > 'i':
+            sequence = Parser.reflect_sequence(sequence)
+
+        return sequence
+
+    @staticmethod
+    def reflect_sequence(sequence: list[str]) -> list[str]:
+
+        # reflect by corners
+        for idx, move in enumerate(sequence):
+            x, y = move[2:4][0], move[2:4][1]
+            
+            new_x = x if x > 'i' else chr(ord('s') - ord(x) + ord('a'))
+            new_y = y if y > 'i' else chr(ord('s') - ord(y) + ord('a'))
+
+            sequence[idx] = move[:2] + new_x + new_y + move[4:]
+        
+        # reflect by moves
+        first_non_axis_move: str | None = None
+        for move in sequence:
+            x, y = move[2:4][0], move[2:4][1]
+            if x != y:
+               first_non_axis_move = move
+        
+        if not first_non_axis_move:
+            raise ValueError
+        
+        for idx, move in enumerate(sequence):
+            x, y = move[2:4][0], move[2:4][1]
+
+            sequence[idx] = move[:2] + y + x + move[4:]
+        
+        return sequence
+
+
+
+        
+
+if __name__ == "__main__":
+    files = listdir("./data/raw/")
+    
+    for file in files:
+        game_info, game_moves = Parser.read_bytes("./data/raw/"+file)
+
+        for sequence in Parser.divide_sequences(game_moves):
+            corner = Parser.parse_sequence(sequence, game_info)
+            print(corner)
+        break
