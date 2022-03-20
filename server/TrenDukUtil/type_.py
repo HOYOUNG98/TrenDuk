@@ -6,8 +6,7 @@ class TreeNode:
         self.move = move
         self.color = color
         self.sequence_depth = sequence_depth
-        self.game_depth = game_depth
-        self.games: list[int] = [game_id]
+        self.games: list[list[int]] = [[game_id, game_depth]]
         self.children: set[int] = set()
     
     def mergeNode(self, other: 'TreeNode') -> None:
