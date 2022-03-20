@@ -32,6 +32,37 @@ class TreeNode:
     
 
 
-# class GameInfo:
-#     def __init__(self, *args, **kwargs) -> None:
+class GameInfo:
+    def __init__(self, *args) -> None:
+        default_info: dict[str, None | str] = {
+            'DT': None,
+            'EV': None,
+            'RO': None,
+            'PB': None,
+            'BR': None,
+            'PW': None,
+            'WR': None,
+            'KM': None,
+            'RE': None,
+        }
+
+        if len(args) == 1 and isinstance(args[0], str):
+            for val in args[0].split("]"):
+                key: str = val[:2]
+                if key in default_info:
+                    default_info[key] = val[3:]
+
+        self.datetime = default_info['DT']
+        self.event = default_info['EV']
+        self.round = default_info['RO']
+        self.black_player = default_info['PB']
+        self.black_rank = default_info['BR']
+        self.white_player = default_info['PW']
+        self.white_rank = default_info['WR']
+        self.komi = default_info['KM']
+        self.result = default_info['RE']
         
+        self.id = hash((self.black_player, self.white_player, self.datetime, self.event))
+    
+    def __repr__(self):
+        return f"{self.black_player}({self.black_rank}) vs {self.white_player}({self.white_rank}), {self.result}, {self.datetime}"

@@ -1,5 +1,5 @@
 from __future__ import annotations
-from type import TreeNode
+from type import TreeNode, GameInfo
 from os import listdir
 
 class Parser:
@@ -18,16 +18,15 @@ class Parser:
         return res[0], res[1:]
 
     @staticmethod
-    def parse_sequence(sequence: list[str], game: str) -> dict:
+    def parse_sequence(sequence: list[str], game_id: int) -> dict:
         
         res: dict = {}
         sequence = Parser.align_sequence(sequence)
-        # game_instance = GameInfo()
         root = TreeNode.root()
 
         for idx, move in enumerate(sequence):
             color, coordinate, game_depth = move[0], move[2:4], move[5:]
-            move_instance = TreeNode(coordinate, color, idx+1, int(game_depth), 1)
+            move_instance = TreeNode(coordinate, color, idx+1, int(game_depth), game_id)
             root.addChild(move_instance.id)
             root = move_instance
 
@@ -110,7 +109,8 @@ if __name__ == "__main__":
     for file in files:
         game_info, game_moves = Parser.read_bytes("./data/raw/"+file)
 
+        game = GameInfo(game_info)
+
         for sequence in Parser.divide_sequences(game_moves):
-            corner = Parser.parse_sequence(sequence, game_info)
-            print(corner)
+            corner = Parser.parse_sequence(sequence, game.id)
         break
