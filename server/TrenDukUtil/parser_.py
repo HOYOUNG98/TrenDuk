@@ -1,6 +1,5 @@
 from __future__ import annotations
-from type import TreeNode, GameInfo
-from os import listdir
+from type_ import TreeNode, GameInfo
 
 class Parser:
     @staticmethod
@@ -18,15 +17,17 @@ class Parser:
         return res[0], res[1:]
 
     @staticmethod
-    def parse_sequence(sequence: list[str], game_id: int) -> dict:
+    def parse_sequence(sequence: list[str], game_info: str) -> dict[int, 'TreeNode']:
         
-        res: dict = {}
+        res: dict[int, 'TreeNode'] = {}
         sequence = Parser.align_sequence(sequence)
         root = TreeNode.root()
 
+        game_instance = GameInfo(game_info)
+
         for idx, move in enumerate(sequence):
             color, coordinate, game_depth = move[0], move[2:4], move[5:]
-            move_instance = TreeNode(coordinate, color, idx+1, int(game_depth), game_id)
+            move_instance = TreeNode(coordinate, color, idx+1, int(game_depth), game_instance.id)
             root.addChild(move_instance.id)
             root = move_instance
 
@@ -66,7 +67,10 @@ class Parser:
 
         # Allow sequence to be in top right corner
         if first_move_x > 'i' or first_move_y > 'i':
-            sequence = Parser.reflect_sequence(sequence)
+            try:
+                sequence = Parser.reflect_sequence(sequence)
+            except ValueError:
+                return []
 
         return sequence
 
@@ -98,19 +102,3 @@ class Parser:
             sequence[idx] = move[:2] + y + x + move[4:]
         
         return sequence
-
-
-
-        
-
-if __name__ == "__main__":
-    files = listdir("./data/raw/")
-    
-    for file in files:
-        game_info, game_moves = Parser.read_bytes("./data/raw/"+file)
-
-        game = GameInfo(game_info)
-
-        for sequence in Parser.divide_sequences(game_moves):
-            corner = Parser.parse_sequence(sequence, game.id)
-        break
