@@ -1,6 +1,6 @@
 from __future__ import annotations
 
-class TreeNode:
+class Node:
     def __init__(self, move:str, color:str, sequence_depth:int, game_depth: int, game_id:int) -> None:
         self.id: int = hash((move, color, sequence_depth))
         self.move = move
@@ -9,7 +9,7 @@ class TreeNode:
         self.games: list[list[int]] = [[game_id, game_depth]]
         self.children: set[int] = set()
     
-    def mergeNode(self, other: 'TreeNode') -> None:
+    def mergeNode(self, other: 'Node') -> None:
         if self.id != other.id:
             raise ValueError
         
@@ -31,7 +31,7 @@ class TreeNode:
     
 
 
-class GameInfo:
+class Game:
     def __init__(self, *args) -> None:
         default_info: dict[str, None | str] = {
             'DT': None,
