@@ -1,13 +1,15 @@
 from __future__ import annotations
+from uuid import UUID
+from random import seed
 
 class Node:
-    def __init__(self, move:str, color:str, sequence_depth:int, game_depth: int, game_id:int) -> None:
-        self.id: int = hash((move, color, sequence_depth))
+    def __init__(self, move:str, color:str, sequence_depth:int, game_depth: int, game_id:str) -> None:
+        self.id: str = f'{move}{color}{sequence_depth}'
         self.move = move
         self.color = color
         self.sequence_depth = sequence_depth
-        self.games: list[list[int]] = [[game_id, game_depth]]
-        self.children: set[int] = set()
+        self.games: list[list[str | int]] = [[game_id, game_depth]]
+        self.children: set[str] = set()
     
     def mergeNode(self, other: 'Node') -> None:
         if self.id != other.id:
@@ -16,15 +18,15 @@ class Node:
         self.games.extend(other.games)
         self.children.update(other.children)
     
-    def addChild(self, node_id:int) -> None:
+    def addChild(self, node_id :str) -> None:
         self.children.add(node_id)
     
-    def existsChild(self, node_id:int) -> bool:
+    def existsChild(self, node_id: int) -> bool:
         return node_id in self.children
     
     @classmethod
     def root(cls):
-        return cls('root', 'root', 0, 0, -1)
+        return cls('root', 'root', 0, 0, 'root')
     
     def __repr__(self):
         return self.color + self.move
@@ -61,7 +63,7 @@ class Game:
         self.komi = default_info['KM']
         self.result = default_info['RE']
         
-        self.id = hash((self.black_player, self.white_player, self.datetime, self.event))
+        self.id: str = f'{self.black_player}{self.white_player}{self.datetime}{self.event}'
     
     def __repr__(self):
         return f"{self.black_player}({self.black_rank}) vs {self.white_player}({self.white_rank}), {self.result}, {self.datetime}"
