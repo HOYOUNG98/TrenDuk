@@ -7,8 +7,8 @@ from type_ import Node, Game
 if __name__ == "__main__":
     files = listdir("./data/raw/")
     
-    nodes: dict[int, 'Node'] = {}
-    games: dict[int, 'Game'] = {}
+    nodes: dict[str, 'Node'] = {}
+    games: dict[str, 'Game'] = {}
     for file in tqdm(files):
         game_info, game_moves = Parser.read_bytes("./data/raw/"+file)
         game_instance = Game(game_info)
@@ -36,10 +36,10 @@ if __name__ == "__main__":
         file.write("PRAGMA locking_mode = EXCLUSIVE;")
         file.write("PRAGMA temp_store = MEMORY;")
 
-        file.write("CREATE TABLE node (node_id INTEGER PRIMARY KEY, move VARCHAR(2) NOT NULL, color VARCHAR(1) NOT NULL, sequence_depth INT); \n")
-        file.write("CREATE TABLE game (game_id INTEGER PRIMARY KEY, datetime VARCHAR(10), event VARCHAR(50), round VARCHAR(50), black_player VARCHAR(50), black_rank VARCHAR(10), white_player VARCHAR(50), white_rank VARCHAR(10), komi VARCHAR(5), result VARCHAR(10)); \n")
-        file.write("CREATE TABLE node_game (node_id INTEGER NOT NULL, game_id INTEGER NOT NULL, game_depth INTEGER, FOREIGN KEY (node_id) references node(node_id), FOREIGN KEY (game_id) references game(game_id), PRIMARY KEY (node_id, game_id, game_depth)); \n")
-        file.write("CREATE TABLE is_child (parent_id INTEGER NOT NULL, child_id INTEGER NOT NULL, FOREIGN KEY (parent_id) references node(node_id), FOREIGN KEY (child_id) references node(node_id), PRIMARY KEY (parent_id, child_id)); \n")
+        file.write("CREATE TABLE node (node_id VARCHAR(10) PRIMARY KEY, move VARCHAR(2) NOT NULL, color VARCHAR(1) NOT NULL, sequence_depth INT); \n")
+        file.write("CREATE TABLE game (game_id VARCHAR(10) PRIMARY KEY, datetime VARCHAR(10), event VARCHAR(50), round VARCHAR(50), black_player VARCHAR(50), black_rank VARCHAR(10), white_player VARCHAR(50), white_rank VARCHAR(10), komi VARCHAR(5), result VARCHAR(10)); \n")
+        file.write("CREATE TABLE node_game (node_id VARCHAR(10) NOT NULL, game_id VARCHAR(10) NOT NULL, game_depth INTEGER, FOREIGN KEY (node_id) references node(node_id), FOREIGN KEY (game_id) references game(game_id), PRIMARY KEY (node_id, game_id, game_depth)); \n")
+        file.write("CREATE TABLE is_child (parent_id VARCHAR(10) NOT NULL, child_id VARCHAR(10) NOT NULL, FOREIGN KEY (parent_id) references node(node_id), FOREIGN KEY (child_id) references node(node_id), PRIMARY KEY (parent_id, child_id)); \n")
 
         for key, val in games.items():
             file.write(f'INSERT INTO game VALUES ("{val.id}", "{val.datetime}", "{val.event}", "{val.round}", "{val.black_player}", "{val.black_rank}", "{val.white_player}", "{val.white_rank}", "{val.komi}", "{val.result}"); \n')

@@ -17,9 +17,9 @@ class Parser:
         return res[0], res[1:]
 
     @staticmethod
-    def parse_sequence(sequence: list[str], game_info: str) -> dict[int, 'Node']:
+    def parse_sequence(sequence: list[str], game_info: str) -> dict[str, 'Node']:
         
-        res: dict[int, 'Node'] = {}
+        res: dict[str, 'Node'] = {}
         sequence = Parser.align_sequence(sequence)
         root = Node.root()
 
