@@ -9,8 +9,8 @@ if __name__ == "__main__":
     
     nodes: dict[str, 'Node'] = {}
     games: dict[str, 'Game'] = {}
-    for file in tqdm(files):
-        game_info, game_moves = Parser.read_bytes("./data/raw/"+file)
+    for file in tqdm(files[:5000]):
+        game_info, game_moves = Parser.read_bytes("./data/raw/" + file)
         game_instance = Game(game_info)
 
         games[game_instance.id] = game_instance

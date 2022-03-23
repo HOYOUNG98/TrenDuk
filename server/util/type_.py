@@ -3,8 +3,8 @@ from uuid import UUID
 from random import seed
 
 class Node:
-    def __init__(self, move:str, color:str, sequence_depth:int, game_depth: int, game_id:str) -> None:
-        self.id: str = f'{move}{color}{sequence_depth}'
+    def __init__(self, move: str, color: str, sequence_depth: int, game_depth: int, game_id: str, parent_id: str) -> None:
+        self.id: str = f'{move}{color}{sequence_depth}{parent_id}'
         self.move = move
         self.color = color
         self.sequence_depth = sequence_depth
@@ -26,7 +26,7 @@ class Node:
     
     @classmethod
     def root(cls):
-        return cls('root', 'root', 0, 0, 'root')
+        return cls('root', 'root', 0, 0, 'root', 'root')
     
     def __repr__(self):
         return self.color + self.move

@@ -27,7 +27,7 @@ class Parser:
 
         for idx, move in enumerate(sequence):
             color, coordinate, game_depth = move[0], move[2:4], move[5:]
-            move_instance = Node(coordinate, color, idx+1, int(game_depth), game_instance.id)
+            move_instance = Node(coordinate, color, idx+1, int(game_depth), game_instance.id, root.id)
             root.addChild(move_instance.id)
             root = move_instance
 
