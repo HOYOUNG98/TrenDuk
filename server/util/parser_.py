@@ -18,7 +18,6 @@ class Parser:
 
     @staticmethod
     def parse_sequence(sequence: list[str], game_info: str) -> dict[str, 'Node']:
-        
         res: dict[str, 'Node'] = {}
         sequence = Parser.align_sequence(sequence)
         root = Node.root()
@@ -49,13 +48,13 @@ class Parser:
             x, y = move[2:4][0], move[2:4][1]
             depth = str(idx+1)
 
-            if x < 'i' and y < 'i':
+            if x < 'j' and y < 'j':
                 top_left.append(move + depth)
-            elif x < 'i' and y > 'i':
+            elif x < 'j' and y > 'j':
                 bottom_left.append(move + depth)
-            elif x > 'i' and y < 'i':
+            elif x > 'j' and y < 'j':
                 top_right.append(move + depth)
-            elif x > 'i' and y > 'i':
+            elif x > 'j' and y > 'j':
                 bottom_right.append(move + depth)
 
         return [top_left, bottom_left, top_right, bottom_right]
@@ -66,11 +65,10 @@ class Parser:
         first_move_x, first_move_y = first_move[2:4][0], first_move[2:4][1]
 
         # Allow sequence to be in top right corner
-        if first_move_x > 'i' or first_move_y > 'i':
-            try:
-                sequence = Parser.reflect_sequence(sequence)
-            except ValueError:
-                return []
+        try:
+            sequence = Parser.reflect_sequence(sequence)
+        except ValueError:
+            return []
 
         return sequence
 
@@ -81,8 +79,8 @@ class Parser:
         for idx, move in enumerate(sequence):
             x, y = move[2:4][0], move[2:4][1]
             
-            new_x = x if x > 'i' else chr(ord('s') - ord(x) + ord('a'))
-            new_y = y if y > 'i' else chr(ord('s') - ord(y) + ord('a'))
+            new_x = x if x > 'j' else chr(ord('s') - ord(x) + ord('a'))
+            new_y = y if y > 'j' else chr(ord('s') - ord(y) + ord('a'))
 
             sequence[idx] = move[:2] + new_x + new_y + move[4:]
         
@@ -92,13 +90,15 @@ class Parser:
             x, y = move[2:4][0], move[2:4][1]
             if x != y:
                first_non_axis_move = move
+               break
         
         if not first_non_axis_move:
             raise ValueError
-        
-        for idx, move in enumerate(sequence):
-            x, y = move[2:4][0], move[2:4][1]
 
-            sequence[idx] = move[:2] + y + x + move[4:]
+        if first_non_axis_move[2:4][0] > first_non_axis_move[2:4][1]:
+            for idx, move in enumerate(sequence):
+                x, y = move[2:4][0], move[2:4][1]
+
+                sequence[idx] = move[:2] + y + x + move[4:]
         
         return sequence
