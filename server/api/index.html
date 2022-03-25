@@ -1,16 +1,21 @@
 <!DOCTYPE html>
 <html>
-    <head>
-      <meta charset="UTF-8">
-      <title>Hello Python from Electron!</title>
-    </head>
-    <body>
-      <script src="fetch.js"> </script>
-      <h1>Hello Python!</h1>
+  <head>
+    <meta charset="UTF-8" />
+    <title>TrenDuk</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script
+      type="application/javascript"
+      src="https://polyfill.io/v3/polyfill.min.js?features=ResizeObserver"
+    ></script>
+    <script src="fetch.js"></script>
+  </head>
+  <body>
+    <button onClick="fetchMove()">fetch</button>
 
-    <button onClick="fetchMove()">Data</button>
-
-    <div id="data"> EMPTY </div>
-    
-    </body>
+    <div>
+      <canvas id="pick_rate"></canvas>
+      <canvas id="win_rate"></canvas>
+    </div>
+  </body>
 </html>
