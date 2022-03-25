@@ -13,7 +13,6 @@ function initiateBoard() {
   var parent_id = "rootroot0root";
 
   board.addEventListener("click", function (x, y) {
-    console.log(curr_color);
     board.addObject({
       x: x,
       y: y,
@@ -40,7 +39,94 @@ function initiateBoard() {
 
     curr_color = curr_color === WGo.B ? WGo.W : WGo.B;
     parent_id = move + color_ + sequence_depth + parent_id;
-    console.log(parent_id);
+  });
+
+  board.addEventListener("mousemove", function (x, y) {
+    const move = String.fromCharCode(x + 97) + String.fromCharCode(18 - y + 97);
+    var old_chart = Chart.getChart("pick_rate");
+
+    if (!old_chart) return;
+
+    var flag = false;
+    for (let i = 0; i < old_chart._metasets.length; i++) {
+      if (move === old_chart._metasets[i].label.substring(0, 2)) flag = true;
+    }
+    if (!flag) return;
+
+    var pick_rate_dataset = [];
+    for (let i = 0; i < old_chart._metasets.length; i++) {
+      const backgroundColor = old_chart._metasets[i]._dataset.backgroundColor;
+      const borderColor = old_chart._metasets[i]._dataset.borderColor;
+      const borderWidth =
+        move === old_chart._metasets[i].label.substring(0, 2) ? 3 : 1;
+
+      pick_rate_dataset.push({
+        label: old_chart._metasets[i].label,
+        backgroundColor,
+        borderColor,
+        borderWidth,
+        data: old_chart._metasets[i]._dataset.data,
+      });
+    }
+
+    const pick_rate_config = {
+      type: "line",
+      data: {
+        labels: Array.from(new Array(23), (_, i) => i + 2000),
+        datasets: pick_rate_dataset,
+      },
+      options: { animation: { duration: 0 } },
+    };
+
+    var old_chart = Chart.getChart("pick_rate");
+    if (old_chart) old_chart.destroy();
+    new Chart(
+      document.getElementById("pick_rate").getContext("2d"),
+      pick_rate_config
+    );
+
+    var old_chart = Chart.getChart("win_rate");
+
+    if (!old_chart) return;
+    console.log("??");
+
+    var flag = false;
+    for (let i = 0; i < old_chart._metasets.length; i++) {
+      if (move === old_chart._metasets[i].label.substring(0, 2)) flag = true;
+    }
+    if (!flag) return;
+
+    var win_rate_dataset = [];
+    for (let i = 0; i < old_chart._metasets.length; i++) {
+      const backgroundColor = old_chart._metasets[i]._dataset.backgroundColor;
+      const borderColor = old_chart._metasets[i]._dataset.borderColor;
+      const borderWidth =
+        move === old_chart._metasets[i].label.substring(0, 2) ? 3 : 1;
+
+      win_rate_dataset.push({
+        label: old_chart._metasets[i].label,
+        backgroundColor,
+        borderColor,
+        borderWidth,
+        data: old_chart._metasets[i]._dataset.data,
+      });
+    }
+
+    const win_rate_config = {
+      type: "line",
+      data: {
+        labels: Array.from(new Array(23), (_, i) => i + 2000),
+        datasets: win_rate_dataset,
+      },
+      options: { animation: { duration: 0 } },
+    };
+
+    var old_chart = Chart.getChart("win_rate");
+    if (old_chart) old_chart.destroy();
+    new Chart(
+      document.getElementById("win_rate").getContext("2d"),
+      win_rate_config
+    );
   });
 }
 
@@ -109,7 +195,7 @@ const fetchMove = (move, color, sequence_depth, parent_id) => {
         type: "line",
         data: {
           labels: Array.from(new Array(23), (_, i) => i + 2000),
-          datasets: pick_rate_dataset,
+          datasets: win_rate_dataset,
         },
         options: {},
       };
@@ -120,8 +206,6 @@ const fetchMove = (move, color, sequence_depth, parent_id) => {
         document.getElementById("win_rate").getContext("2d"),
         win_rate_config
       );
-
-      return pick_rate_chart;
     }
   );
 };
