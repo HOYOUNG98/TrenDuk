@@ -1987,25 +1987,8 @@
     //whiteStoneGraphic: [ WGo.DIR+"white_64.png" ], // Single image only, lowres
     //blackStoneGraphic: [ WGo.DIR+"black_64.png" ], // Single image only, lowres
 
-    whiteStoneGraphic: [
-      WGo.DIR + "stones/white00_128.png",
-      WGo.DIR + "stones/white01_128.png",
-      WGo.DIR + "stones/white02_128.png",
-      WGo.DIR + "stones/white03_128.png",
-      WGo.DIR + "stones/white04_128.png",
-      WGo.DIR + "stones/white05_128.png",
-      WGo.DIR + "stones/white06_128.png",
-      WGo.DIR + "stones/white07_128.png",
-      WGo.DIR + "stones/white08_128.png",
-      WGo.DIR + "stones/white09_128.png",
-      WGo.DIR + "stones/white10_128.png",
-    ],
-    blackStoneGraphic: [
-      WGo.DIR + "stones/black00_128.png",
-      WGo.DIR + "stones/black01_128.png",
-      WGo.DIR + "stones/black02_128.png",
-      WGo.DIR + "stones/black03_128.png",
-    ],
+    whiteStoneGraphic: [WGo.DIR + "white_128.png"],
+    blackStoneGraphic: [WGo.DIR + "black_128.png"],
 
     theme: {},
   };
