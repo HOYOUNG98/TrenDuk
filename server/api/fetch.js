@@ -1,7 +1,13 @@
-function displayData() {
-  var button = document.getElementById("data");
-
-  button.style.display = button.style.display === "none" ? "block" : "none";
+function initiateBoard() {
+  var board = new WGo.Board(document.getElementById("board"), {
+    width: 400,
+    section: {
+      top: 0,
+      left: 9,
+      right: 0,
+      bottom: 9,
+    },
+  });
 }
 
 const fetchMove = () => {

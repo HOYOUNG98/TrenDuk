@@ -9,8 +9,10 @@
       src="https://polyfill.io/v3/polyfill.min.js?features=ResizeObserver"
     ></script>
     <script src="fetch.js"></script>
+    <script type="text/javascript" src="./wgo/wgo.js"></script>
   </head>
-  <body>
+  <body onload="initiateBoard()">
+    <div id="board"></div>
     <button onClick="fetchMove()">fetch</button>
 
     <div>
