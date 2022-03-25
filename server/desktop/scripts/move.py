@@ -1,17 +1,24 @@
 import sys
 import sqlite3
 import json
+import argparse
+
 
 conn = sqlite3.connect("../main.db", check_same_thread=False)
 cursor = conn.cursor()
 
-move = 'pp'
-color = 'B'
-sequence_depth = 1
+parser = argparse.ArgumentParser()
+parser.add_argument("move")
+parser.add_argument("color")
+parser.add_argument("sequence_depth")
+parser.add_argument("parent_id")
 
-node_id = f'{move}{color}{sequence_depth}rootroot0root'
+args = parser.parse_args()
+move, color, sequence_depth, parent_id = args.move, args.color, args.sequence_depth, args.parent_id
 
-query = f'''
+node_id = f"{move}{color}{sequence_depth}{parent_id}"
+
+query = f"""
         WITH children AS (
             SELECT child_id
             FROM node 
@@ -47,12 +54,12 @@ query = f'''
 
         SELECT Substr(move, 0, 5) as move, res.year, res.win_rate, CAST(sub_total AS FLOAT) / CAST(total.total as FLOAT) as pick_rate
         FROM res LEFT JOIN total ON res.year = total.year;
-        '''
+        """
 
 res = cursor.execute(query).fetchall()
 
 # year from 2000 to 2022
-years, colors = list({val[0] for val in res}), ['B', 'W']
+years, colors = list({val[0] for val in res}), ["B", "W"]
 yearly: dict[str, dict[str, float]] = {key1: {key2: 0 for key2 in colors} for key1 in years}
 
 moves = list({val[0] for val in res})
