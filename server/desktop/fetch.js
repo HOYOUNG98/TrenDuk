@@ -1,6 +1,6 @@
 function initiateBoard() {
   var board = new WGo.Board(document.getElementById("board"), {
-    width: 400,
+    width: 555,
     section: {
       top: 0,
       left: 9,
@@ -75,7 +75,15 @@ function initiateBoard() {
         labels: Array.from(new Array(23), (_, i) => i + 2000),
         datasets: pick_rate_dataset,
       },
-      options: { animation: { duration: 0 } },
+      options: {
+        animation: { duration: 0 },
+        plugins: {
+          title: {
+            display: true,
+            text: "pick rate",
+          },
+        },
+      },
     };
 
     var old_chart = Chart.getChart("pick_rate");
@@ -118,7 +126,15 @@ function initiateBoard() {
         labels: Array.from(new Array(23), (_, i) => i + 2000),
         datasets: win_rate_dataset,
       },
-      options: { animation: { duration: 0 } },
+      options: {
+        animation: { duration: 0 },
+        plugins: {
+          title: {
+            display: true,
+            text: "win rate",
+          },
+        },
+      },
     };
 
     var old_chart = Chart.getChart("win_rate");
@@ -163,7 +179,14 @@ const fetchMove = (move, color, sequence_depth, parent_id) => {
           labels: Array.from(new Array(23), (_, i) => i + 2000),
           datasets: pick_rate_dataset,
         },
-        options: {},
+        options: {
+          plugins: {
+            title: {
+              display: true,
+              text: "pick rate",
+            },
+          },
+        },
       };
 
       var old_chart = Chart.getChart("pick_rate");
@@ -197,7 +220,14 @@ const fetchMove = (move, color, sequence_depth, parent_id) => {
           labels: Array.from(new Array(23), (_, i) => i + 2000),
           datasets: win_rate_dataset,
         },
-        options: {},
+        options: {
+          plugins: {
+            title: {
+              display: true,
+              text: "win rate",
+            },
+          },
+        },
       };
 
       var old_chart = Chart.getChart("win_rate");
