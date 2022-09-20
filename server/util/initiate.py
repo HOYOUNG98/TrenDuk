@@ -6,20 +6,20 @@ from type_ import Node, Game
 
 if __name__ == "__main__":
     files = listdir("./data/raw/")
-    
+
     nodes: dict[str, 'Node'] = {}
     games: dict[str, 'Game'] = {}
     for file in tqdm(files[-10000:]):
-        game_info, game_moves = Parser.read_bytes("./data/raw/" + file)
+        game_info, game_moves = Parser.read_file("./data/raw/" + file)
         game_instance = Game(game_info)
 
         games[game_instance.id] = game_instance
 
         for sequence in Parser.divide_sequences(game_moves):
-            
+
             if not sequence:
                 continue
-            
+
             sequence_dict = Parser.parse_sequence(sequence, game_info)
 
             for key, val in sequence_dict.items():
@@ -28,7 +28,6 @@ if __name__ == "__main__":
                 else:
                     nodes[key] = val
 
-    
     with open('./initiate.sql', 'w') as file:
 
         file.write("PRAGMA journal_mode = OFF;")
@@ -42,14 +41,17 @@ if __name__ == "__main__":
         file.write("CREATE TABLE is_child (parent_id VARCHAR(10) NOT NULL, child_id VARCHAR(10) NOT NULL, FOREIGN KEY (parent_id) references node(node_id), FOREIGN KEY (child_id) references node(node_id), PRIMARY KEY (parent_id, child_id)); \n")
 
         for key, val in games.items():
-            file.write(f'INSERT INTO game VALUES ("{val.id}", "{val.datetime}", "{val.event}", "{val.round}", "{val.black_player}", "{val.black_rank}", "{val.white_player}", "{val.white_rank}", "{val.komi}", "{val.result}"); \n')
+            file.write(
+                f'INSERT INTO game VALUES ("{val.id}", "{val.datetime}", "{val.event}", "{val.round}", "{val.black_player}", "{val.black_rank}", "{val.white_player}", "{val.white_rank}", "{val.komi}", "{val.result}"); \n')
 
         for key, val in nodes.items():
-            file.write(f'INSERT INTO node VALUES ("{val.id}", "{val.move}", "{val.color}", {val.sequence_depth}); \n')
+            file.write(
+                f'INSERT INTO node VALUES ("{val.id}", "{val.move}", "{val.color}", {val.sequence_depth}); \n')
 
             for game_id, game_depth in val.games:
-                file.write(f'INSERT INTO node_game VALUES ("{val.id}", "{game_id}", "{game_depth}"); \n')
-            
+                file.write(
+                    f'INSERT INTO node_game VALUES ("{val.id}", "{game_id}", "{game_depth}"); \n')
+
             for child in val.children:
-                file.write(f'INSERT INTO is_child VALUES ("{val.id}", "{child}"); \n')
-                
+                file.write(
+                    f'INSERT INTO is_child VALUES ("{val.id}", "{child}"); \n')
