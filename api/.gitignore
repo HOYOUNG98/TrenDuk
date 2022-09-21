@@ -1,5 +1,0 @@
-*.csv
-/venv
-__pycache__
-deploy.sh
-.dockerignore

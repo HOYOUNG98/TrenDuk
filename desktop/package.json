@@ -1,0 +1,26 @@
+{
+  "name": "trenduk-desktop",
+  "version": "1.0.0",
+  "description": "A minimal Electron application",
+  "main": "main.js",
+  "scripts": {
+    "start": "electron .",
+    "deploy": " npx electron-packager ./ TrenDuk"
+  },
+  "keywords": [
+    "Electron",
+    "quick",
+    "start",
+    "tutorial",
+    "demo"
+  ],
+  "author": "GitHub",
+  "license": "CC0-1.0",
+  "dependencies": {
+    "sqlite3": "^5.1.1"
+  },
+  "devDependencies": {
+    "electron-packager": "^15.2.0",
+    "electron": "^12.0.1"
+  }
+}
