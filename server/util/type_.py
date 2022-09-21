@@ -1,11 +1,10 @@
 from __future__ import annotations
 from uuid import UUID
-from random import seed
 
 
 class Node:
     def __init__(self, move: str, color: str, sequence_depth: int, game_depth: int, game_id: str, parent_id: str) -> None:
-        self.id: str = hash(f'{move}{color}{sequence_depth}{parent_id}')
+        self.id: str = f'{move}{color}{sequence_depth}{parent_id}'
         self.move = move
         self.color = color
         self.sequence_depth = sequence_depth
@@ -73,8 +72,7 @@ class Game:
         self.komi = default_info['KM']
         self.result = default_info['RE']
 
-        self.id: str = hash(
-            f'{self.black_player}{self.white_player}{self.datetime}{self.event}')
+        self.id: str = f'{self.black_player}{self.white_player}{self.datetime}{self.event}'
 
     def __repr__(self):
         return f"{self.black_player}({self.black_rank}) vs {self.white_player}({self.white_rank}), {self.result}, {self.datetime}"

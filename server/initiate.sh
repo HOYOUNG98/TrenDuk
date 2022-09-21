@@ -7,4 +7,3 @@ rm -rf initiate.sql
 
 cd ..
 mv ./util/main.db main.db
-rm -rf
