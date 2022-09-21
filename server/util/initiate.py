@@ -1,32 +1,46 @@
 from __future__ import annotations
-from os import listdir
 from parser_ import Parser
 from tqdm import tqdm
-from type_ import Node, Game
+from type_ import Game
+from io import BytesIO
+
+import boto3
+import zipfile
+import random
+
+# S3
+BUCKET_NAME = "trenduk-zip"
+FILE_NAME = "initiate.zip"
 
 if __name__ == "__main__":
-    files = listdir("./data/raw/")
 
-    nodes: dict[str, 'Node'] = {}
-    games: dict[str, 'Game'] = {}
-    for file in tqdm(files[-10000:]):
-        game_info, game_moves = Parser.read_file("./data/raw/" + file)
-        game_instance = Game(game_info)
+    s3_client = boto3.client('s3')
+    response = s3_client.get_object(Bucket=BUCKET_NAME, Key=FILE_NAME)
+    buffer = BytesIO(response['Body'].read())
+    zipped = zipfile.ZipFile(buffer)
 
-        games[game_instance.id] = game_instance
+    games, nodes = {}, {}
+    for file in tqdm(random.sample(zipped.namelist(), 10000)):
+        with zipped.open(file, "r") as f_in:
+            game_info, game_moves = Parser.read_bytes(f_in.read())
+            game_instance = Game(game_info)
 
-        for sequence in Parser.divide_sequences(game_moves):
+            games[game_instance.id] = game_instance
 
-            if not sequence:
-                continue
+            # There are four corners
+            for sequence in Parser.divide_sequences(game_moves):
 
-            sequence_dict = Parser.parse_sequence(sequence, game_info)
+                # There may be invalid sequences
+                if not sequence:
+                    continue
 
-            for key, val in sequence_dict.items():
-                if key in nodes:
-                    nodes[key].mergeNode(val)
-                else:
-                    nodes[key] = val
+                sequence_dict = Parser.parse_sequence(sequence, game_info)
+
+                for key, val in sequence_dict.items():
+                    if key in nodes:
+                        nodes[key].mergeNode(val)
+                    else:
+                        nodes[key] = val
 
     with open('./initiate.sql', 'w') as file:
 
