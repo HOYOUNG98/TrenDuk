@@ -11,6 +11,7 @@ function initiateBoard() {
 
   var curr_color = WGo.B;
   var parent_id = "rootroot0root";
+  var valid_moves = [];
 
   board.addEventListener("click", async function (x, y) {
     board.addObject({
@@ -48,6 +49,8 @@ function initiateBoard() {
       });
     });
 
+    valid_moves = unique_moves;
+
     updateChart(res);
 
     curr_color = curr_color === WGo.B ? WGo.W : WGo.B;
@@ -71,7 +74,7 @@ function initiateBoard() {
       const backgroundColor = old_chart._metasets[i]._dataset.backgroundColor;
       const borderColor = old_chart._metasets[i]._dataset.borderColor;
       const borderWidth =
-        move === old_chart._metasets[i].label.substring(0, 2) ? 3 : 1;
+        move === old_chart._metasets[i].label.substring(0, 2) ? 3 : 0.5;
 
       pick_rate_dataset.push({
         label: old_chart._metasets[i].label,
