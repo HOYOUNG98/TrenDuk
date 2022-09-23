@@ -147,9 +147,14 @@ function initiateBoard() {
 
 const updateChart = ({ pick_rate, win_rate }) => {
   var pick_rate_dataset = [];
+  var win_rate_dataset = [];
 
   for (const [move, data] of Object.entries(pick_rate)) {
-    const updated_data = data.map((val) => {
+    const pick_rate_data = data.map((val) => {
+      return val === 0 ? NaN : val;
+    });
+
+    const win_rate_data = win_rate[move].map((val) => {
       return val === 0 ? NaN : val;
     });
 
@@ -159,7 +164,14 @@ const updateChart = ({ pick_rate, win_rate }) => {
       label: move,
       backgroundColor: randomColor,
       borderColor: randomColor,
-      data: updated_data,
+      data: pick_rate_data,
+    });
+
+    win_rate_dataset.push({
+      label: move,
+      backgroundColor: randomColor,
+      borderColor: randomColor,
+      data: win_rate_data,
     });
   }
 
@@ -185,23 +197,6 @@ const updateChart = ({ pick_rate, win_rate }) => {
     document.getElementById("pick_rate").getContext("2d"),
     pick_rate_config
   );
-
-  var win_rate_dataset = [];
-
-  for (const [move, data] of Object.entries(win_rate)) {
-    const updated_data = data.map((val) => {
-      return val === 0 ? NaN : val;
-    });
-
-    const randomColor = "#" + Math.floor(Math.random() * 16777215).toString(16);
-
-    win_rate_dataset.push({
-      label: move,
-      backgroundColor: randomColor,
-      borderColor: randomColor,
-      data: updated_data,
-    });
-  }
 
   const win_rate_config = {
     type: "line",
