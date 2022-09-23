@@ -35,6 +35,19 @@ function initiateBoard() {
 
     const color_ = color === WGo.B ? "B" : "W";
     let res = await window.api.query(move, color_, sequence_depth, parent_id);
+
+    // Add options to our board
+    unique_moves = [];
+    let moves = Object.keys(res.pick_rate).map((val) => val.slice(0, 2));
+
+    moves.forEach((move) => {
+      board.addObject({
+        x: move[0].charCodeAt(0) - 97,
+        y: 115 - move[1].charCodeAt(0),
+        type: "MA",
+      });
+    });
+
     updateChart(res);
 
     curr_color = curr_color === WGo.B ? WGo.W : WGo.B;
