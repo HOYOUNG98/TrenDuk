@@ -39,19 +39,24 @@ function initiateBoard() {
 
     // Add options to our board
     unique_moves = [];
+
     let moves = Object.keys(res.pick_rate).map((val) => val.slice(0, 2));
 
-    moves.forEach((move) => {
-      board.addObject({
-        x: move[0].charCodeAt(0) - 97,
-        y: 115 - move[1].charCodeAt(0),
-        type: "MA",
-      });
+    Object.keys(res.pick_rate).forEach((move) => {
+      var new_color = curr_color === WGo.B ? "W" : "B";
+      if (move.substring(2, 3) === new_color) {
+        move = move.slice(0, 2);
+        board.addObject({
+          x: move[0].charCodeAt(0) - 97,
+          y: 115 - move[1].charCodeAt(0),
+          type: "MA",
+        });
+      }
     });
 
     valid_moves = unique_moves;
 
-    updateChart(res);
+    updateChart(res, curr_color);
 
     curr_color = curr_color === WGo.B ? WGo.W : WGo.B;
     parent_id = move + color_ + sequence_depth + parent_id;
@@ -125,11 +130,16 @@ function initiateBoard() {
   });
 }
 
-const updateChart = ({ pick_rate, win_rate }) => {
+const updateChart = ({ pick_rate, win_rate }, new_color) => {
   var pick_rate_dataset = [];
   var win_rate_dataset = [];
 
+  var new_color = new_color === WGo.B ? "B" : "W";
   for (const [move, data] of Object.entries(pick_rate)) {
+    if (move.substring(2, 3) === new_color) {
+      continue;
+    }
+
     const pick_rate_data = data.map((val) => {
       return val === 0 ? NaN : val;
     });
