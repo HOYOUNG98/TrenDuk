@@ -1,6 +1,6 @@
 # TrenDuk
 
-What moves are popular? Visit https://www.trenduk-go.com!
+What moves are popular? 
 
 ## What is TrenDuk?
 
