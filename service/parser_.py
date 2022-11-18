@@ -1,5 +1,5 @@
 from __future__ import annotations
-from type_ import Node, Game
+from service.type_ import Node, Game
 
 
 class Parser:
@@ -36,6 +36,11 @@ class Parser:
 
         for idx, move in enumerate(sequence):
             color, coordinate, game_depth = move[0], move[2:4], move[5:]
+
+            # We don't want to compute all the way
+            if int(game_depth) > 10:
+                continue
+            
             move_instance = Node(coordinate, color, idx+1,
                                  int(game_depth), game_instance.id, root.id)
             root.addChild(move_instance.id)

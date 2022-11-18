@@ -66,15 +66,11 @@ contextBridge.exposeInMainWorld("api", {
 
     return new Promise((resolve, _) => {
       db.all(sql, [id, color], (err, rows) => {
-        console.log(err, rows);
-
         if (err) {
           return console.error(err.message);
         }
 
-        console.log(rows);
         let unique_moves = [...new Set(rows.map((row) => row.move))];
-        console.log(unique_moves);
 
         let pick_rates = {};
         let win_rates = {};
@@ -82,8 +78,6 @@ contextBridge.exposeInMainWorld("api", {
           pick_rates[move] = new Array(23).fill(0);
           win_rates[move] = new Array(23).fill(0);
         });
-
-        console.log(rows);
 
         rows.forEach(
           ({
@@ -99,9 +93,33 @@ contextBridge.exposeInMainWorld("api", {
           }
         );
 
+        // filter out datapoints that doesn't pass threshold.
+        // if a move has never passed a pick rate of 10% throughout entire years, eliminate it.
+
+        const THRESHOLD = 0.1;
+
+        const entries = Object.entries(pick_rates);
+        const filtered_keys = entries
+          .filter((entry) => Math.max(...entry[1]) >= THRESHOLD)
+          .map((entry) => entry[0]);
+
+        notable_pick_rates = Object.keys(win_rates)
+          .filter((key) => filtered_keys.includes(key))
+          .reduce((obj, key) => {
+            obj[key] = pick_rates[key];
+            return obj;
+          }, {});
+
+        notable_win_rates = Object.keys(win_rates)
+          .filter((key) => filtered_keys.includes(key))
+          .reduce((obj, key) => {
+            obj[key] = win_rates[key];
+            return obj;
+          }, {});
+
         db.close();
 
-        resolve({ pick_rate: pick_rates, win_rate: win_rates });
+        resolve({ pick_rate: notable_pick_rates, win_rate: notable_win_rates });
       });
     });
   },

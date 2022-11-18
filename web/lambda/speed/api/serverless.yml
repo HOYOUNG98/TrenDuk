@@ -1,0 +1,24 @@
+service: trenduk
+provider:
+  name: aws
+  runtime: python3.7
+  region: us-east-1
+custom:
+  pythonRequirements:
+    dockerizePip: true
+package:
+  individually: false
+  patterns:
+    - package.json
+    - package-log.json
+    - node_modules/**
+functions:
+  api:
+    handler: api.rates_by_child
+    events:
+      - http:
+          path: rates_by_child
+          method: get
+
+plugins:
+  - serverless-python-requirements
