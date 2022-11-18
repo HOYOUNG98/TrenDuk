@@ -1,2 +1,6 @@
 *.sh
 venv/
+node_modules/
+package-lock.json
+.serverless
+*.db
