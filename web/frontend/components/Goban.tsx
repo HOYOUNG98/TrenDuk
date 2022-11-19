@@ -1,15 +1,19 @@
 // library imports
-import React, { forwardRef, Ref, useEffect, useState } from "react";
+import React, { useRef, Ref, useEffect, useState } from "react";
 
 declare const window: any;
 
-export const Goban: React.FC = () => {
-  const refBoard = React.useRef<HTMLDivElement>(null);
+interface IGobanProps {
+  size: number;
+}
+
+export const Goban: React.FC<IGobanProps> = ({ size }) => {
+  const refBoard = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    if (refBoard && refBoard.current) {
-      var board = new window.WGo.Board(refBoard.current, {
-        width: 500,
+    if (refBoard && refBoard.current && !refBoard.current.innerHTML) {
+      new window.WGo.Board(refBoard.current, {
+        width: size,
         section: {
           top: 0,
           left: 9,
@@ -19,18 +23,11 @@ export const Goban: React.FC = () => {
       });
     }
 
-    return () => {
-      let boardElement: HTMLElement = document.getElementById(
-        "wgoboard"
-      ) as HTMLElement;
-      boardElement.innerHTML = "";
-    };
+    // return () => {
+    //   console.log("!");
+    //   refBoard?.current?.remove();
+    // };
   }, []);
-  return <Board ref={refBoard} />;
-};
 
-const Board: React.FC<{ ref: Ref<HTMLDivElement> }> = forwardRef(
-  (_prop, ref) => {
-    return <div ref={ref} id="wgoboard"></div>;
-  }
-);
+  return <div ref={refBoard} />;
+};
