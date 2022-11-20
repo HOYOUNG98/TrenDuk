@@ -2,7 +2,6 @@ import { Flex, Grid } from "@chakra-ui/react";
 import Head from "next/head";
 import { ChildStats } from "../components/ChildStats";
 import { Goban } from "../components/Goban";
-import styles from "../styles/Home.module.css";
 
 export default function Home() {
   return (
@@ -13,7 +12,7 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex>
-        <Goban size={500} />
+        <Goban size={500} moves={[]} />
 
         <Grid templateColumns="repeat(2, 4fr)" gap={6}>
           {Array.from(Array(5).keys()).map((_) => (

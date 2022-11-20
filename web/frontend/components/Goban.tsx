@@ -5,14 +5,21 @@ declare const window: any;
 
 interface IGobanProps {
   size: number;
+  moves: Array<INode>;
 }
 
-export const Goban: React.FC<IGobanProps> = ({ size }) => {
+interface INode {
+  color: "B" | "W";
+  x: number;
+  y: number;
+}
+
+export const Goban: React.FC<IGobanProps> = ({ size, moves }) => {
   const refBoard = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     if (refBoard && refBoard.current && !refBoard.current.innerHTML) {
-      new window.WGo.Board(refBoard.current, {
+      var board = new window.WGo.Board(refBoard.current, {
         width: size,
         section: {
           top: 0,
@@ -22,6 +29,14 @@ export const Goban: React.FC<IGobanProps> = ({ size }) => {
         },
       });
     }
+
+    moves.forEach((move) => {
+      board.addObject({
+        x: move.x,
+        y: move.y,
+        c: move.color === "B" ? window.WGo.B : window.WGo.W,
+      });
+    });
 
     // return () => {
     //   console.log("!");

@@ -35,12 +35,11 @@ const PercentChart = () => {
       a: 66,
     },
   ];
-  const toPercent = (decimal: number) => `${decimal}%`;
 
   return (
     <AreaChart
       width={250}
-      height={100}
+      height={75}
       data={data}
       stackOffset="expand"
       margin={{
@@ -50,8 +49,6 @@ const PercentChart = () => {
         bottom: 0,
       }}
     >
-      <XAxis dataKey="month" />
-      <YAxis tickFormatter={toPercent} />
       <Area type="monotone" dataKey="a" stroke="#000000" fill="#000000" />
     </AreaChart>
   );
@@ -60,7 +57,7 @@ const PercentChart = () => {
 export const ChildStats: React.FC<{}> = () => {
   return (
     <Flex>
-      <Goban size={200} />
+      <Goban size={150} moves={[]} />
       <Flex direction={"column"}>
         <PercentChart />
         <PercentChart />
