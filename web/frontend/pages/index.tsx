@@ -1,9 +1,38 @@
-import { Flex, Grid } from "@chakra-ui/react";
+import { Flex, Grid, GridItem } from "@chakra-ui/react";
 import Head from "next/head";
+import axios from "axios";
+
 import { ChildStats } from "../components/ChildStats";
 import { Goban } from "../components/Goban";
+import { useEffect, useState } from "react";
 
+interface IData {
+  [key: string]: {
+    pick_rates: any;
+    win_rates: any;
+  };
+}
+
+interface IMove {
+  color: "B" | "W";
+  x: number;
+  y: number;
+}
 export default function Home() {
+  const [currentNode, updateNode] = useState<string>("rootroot0root");
+  const [data, setData] = useState<IData>({});
+  const [moves, updateMoves] = useState<Array<IMove>>([]);
+
+  useEffect(() => {
+    axios
+      .get(
+        `https://cs2wm0wty9.execute-api.us-east-1.amazonaws.com/production/rates_by_parent?parent=${currentNode}`
+      )
+      .then((response) => {
+        setData(response.data);
+      });
+  }, [currentNode]);
+
   return (
     <div>
       <Head>
@@ -12,12 +41,23 @@ export default function Home() {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <Flex>
-        <Goban size={500} moves={[]} />
+        <Goban size={500} moves={moves} />
 
         <Grid templateColumns="repeat(2, 4fr)" gap={6}>
-          {Array.from(Array(5).keys()).map((_) => (
-            <ChildStats />
-          ))}
+          {Object.keys(data).map((key, _) => {
+            const color = key.substring(2, 3) as "B" | "W";
+            const x = key.substring(0).charCodeAt(0) - "a".charCodeAt(0);
+            const y = 18 - (key.substring(1).charCodeAt(0) - "a".charCodeAt(0));
+            return (
+              <div>
+                <ChildStats
+                  pickRate={data[key]["pick_rates"]}
+                  winRate={data[key]["win_rates"]}
+                  moves={[...moves, { color, x, y }]}
+                />
+              </div>
+            );
+          })}
         </Grid>
       </Flex>
     </div>

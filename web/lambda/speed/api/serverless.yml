@@ -14,10 +14,10 @@ package:
     - node_modules/**
 functions:
   api:
-    handler: api.rates_by_child
+    handler: api.rates_by_parent
     events:
       - http:
-          path: rates_by_child
+          path: rates_by_parent
           method: get
 
 plugins:

@@ -2,18 +2,28 @@ import sqlite3
 import json
 
 
-def rates_by_child(event, _):
+def rates_by_parent(event, _):
 
-    child = event['queryStringParameters']['child']
+    parent = event['queryStringParameters']['parent']
 
     # query from database
     conn = sqlite3.connect(f'precomputed_v1.db')
-    conn.row_factory = dict_factory
     cursor = conn.cursor()
 
-    query = f"SELECT * FROM precomputed WHERE node_id='{child}';"
+    query = f"SELECT * FROM precomputed WHERE parent_id='{parent}';"
     res = cursor.execute(query)
-    data = res.fetchone()
+    
+    data = {}
+    for d in res.fetchall():
+        key = d[0]
+        data[key] = {"pick_rates": [], "win_rates": []}
+
+        pick_rates = d[1:-1][::2]
+        win_rates = d[1:-1][1::2]
+        for i in range(13):
+            data[key]['pick_rates'].append({"year":2010+i, "rate":pick_rates[i]})
+            data[key]['win_rates'].append({"year":2010+i, "rate":win_rates[i]})
+
 
     return {
         "isBase64Encoded": True,
@@ -29,5 +39,5 @@ def dict_factory(cursor, row):
     return table
 
 if __name__ == "__main__":
-    res = rates_by_child({"queryStringParameters": {"child": "pqB1rootroot0root"} }, {})
+    res = rates_by_parent({"queryStringParameters": {"parent": "rootroot0root"} }, {})
     print(res)

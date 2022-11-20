@@ -4,38 +4,23 @@ import React, { useRef, Ref, useEffect, useState } from "react";
 import { AreaChart, XAxis, YAxis, Area } from "recharts";
 import { Goban } from "./Goban";
 
-const PercentChart = () => {
-  const data = [
-    {
-      month: "2015.01",
-      a: 10,
-    },
-    {
-      month: "2015.02",
-      a: 8,
-    },
-    {
-      month: "2015.03",
-      a: 9,
-    },
-    {
-      month: "2015.04",
-      a: 5,
-    },
-    {
-      month: "2015.05",
-      a: 40,
-    },
-    {
-      month: "2015.06",
-      a: 50,
-    },
-    {
-      month: "2015.07",
-      a: 66,
-    },
-  ];
+interface IPercentChartProps {
+  data: Array<any>;
+}
 
+interface IMove {
+  color: "B" | "W";
+  x: number;
+  y: number;
+}
+
+interface IChildStatsProps {
+  pickRate: Array<any>;
+  winRate: Array<any>;
+  moves: Array<IMove>;
+}
+
+const PercentChart: React.FC<IPercentChartProps> = ({ data }) => {
   return (
     <AreaChart
       width={250}
@@ -49,18 +34,22 @@ const PercentChart = () => {
         bottom: 0,
       }}
     >
-      <Area type="monotone" dataKey="a" stroke="#000000" fill="#000000" />
+      <Area type="monotone" dataKey="rate" stroke="#000000" fill="#000000" />
     </AreaChart>
   );
 };
 
-export const ChildStats: React.FC<{}> = () => {
+export const ChildStats: React.FC<IChildStatsProps> = ({
+  pickRate,
+  winRate,
+  moves,
+}) => {
   return (
     <Flex>
-      <Goban size={150} moves={[]} />
+      <Goban size={150} moves={moves} />
       <Flex direction={"column"}>
-        <PercentChart />
-        <PercentChart />
+        <PercentChart data={pickRate} />
+        <PercentChart data={winRate} />
       </Flex>
     </Flex>
   );
