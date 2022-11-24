@@ -1,7 +1,8 @@
 // library imports
 import { Flex } from "@chakra-ui/react";
-import React, { useRef, Ref, useEffect, useState } from "react";
-import { AreaChart, XAxis, YAxis, Area } from "recharts";
+import React, { Dispatch, SetStateAction } from "react";
+import { AreaChart, Area } from "recharts";
+import { colorObjToStr } from "../utils/helper";
 import { Goban } from "./Goban";
 
 interface IPercentChartProps {
@@ -12,12 +13,15 @@ interface IMove {
   color: "B" | "W";
   x: number;
   y: number;
+  depth: number;
 }
 
 interface IChildStatsProps {
   pickRate: Array<any>;
   winRate: Array<any>;
   moves: Array<IMove>;
+  updateNode: Dispatch<SetStateAction<string>>;
+  updateMoves: Dispatch<SetStateAction<IMove[]>>;
 }
 
 const PercentChart: React.FC<IPercentChartProps> = ({ data }) => {
@@ -43,10 +47,16 @@ export const ChildStats: React.FC<IChildStatsProps> = ({
   pickRate,
   winRate,
   moves,
+  updateNode,
 }) => {
+  const handleBoardClick = () => {
+    updateNode(colorObjToStr(moves[moves.length - 1]));
+  };
   return (
     <Flex gap={3}>
-      <Goban size={150} moves={moves} />
+      <div onClick={handleBoardClick}>
+        <Goban size={150} moves={moves} />
+      </div>
       <Flex direction={"column"}>
         <PercentChart data={pickRate} />
         <PercentChart data={winRate} />

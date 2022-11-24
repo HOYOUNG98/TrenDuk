@@ -1,5 +1,5 @@
 // library imports
-import React, { useRef, Ref, useEffect, useState } from "react";
+import React, { useRef, useEffect, useState } from "react";
 
 declare const window: any;
 
@@ -16,10 +16,11 @@ interface IMove {
 
 export const Goban: React.FC<IGobanProps> = ({ size, moves }) => {
   const refBoard = useRef<HTMLDivElement>(null);
+  const [board, setBoard] = useState<any>(null);
 
   useEffect(() => {
     if (refBoard && refBoard.current && !refBoard.current.innerHTML) {
-      var board = new window.WGo.Board(refBoard.current, {
+      var initBoard = new window.WGo.Board(refBoard.current, {
         width: size,
         section: {
           top: 0,
@@ -29,8 +30,10 @@ export const Goban: React.FC<IGobanProps> = ({ size, moves }) => {
         },
       });
 
+      setBoard(initBoard);
+
       moves.forEach((move) => {
-        board.addObject({
+        initBoard.addObject({
           x: move.x,
           y: move.y,
           c: move.color === "B" ? window.WGo.B : window.WGo.W,
@@ -42,7 +45,20 @@ export const Goban: React.FC<IGobanProps> = ({ size, moves }) => {
     //   console.log("!");
     //   refBoard?.current?.remove();
     // };
-  }, []);
+  });
+
+  useEffect(() => {
+    if (board) {
+      board.removeAllObjects();
+      moves.forEach((move) => {
+        board.addObject({
+          x: move.x,
+          y: move.y,
+          c: move.color === "B" ? window.WGo.B : window.WGo.W,
+        });
+      });
+    }
+  }, [moves]);
 
   return <div ref={refBoard} />;
 };

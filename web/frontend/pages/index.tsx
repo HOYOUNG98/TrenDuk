@@ -17,6 +17,7 @@ import { Goban } from "../components/Goban";
 import { useEffect, useState } from "react";
 import { Footer } from "../components/Footer";
 import { Header } from "../components/Header";
+import { colorObjToStr, colorStrToObj } from "../utils/helper";
 
 interface IData {
   [key: string]: {
@@ -29,6 +30,7 @@ interface IMove {
   color: "B" | "W";
   x: number;
   y: number;
+  depth: number;
 }
 export default function Home() {
   const [currentNode, updateNode] = useState<string>("rootroot0root");
@@ -36,11 +38,26 @@ export default function Home() {
   const [moves, updateMoves] = useState<Array<IMove>>([]);
 
   useEffect(() => {
+    console.log(currentNode);
+    if (currentNode !== "rootroot0root") {
+      updateMoves((old) => [...old, colorStrToObj(currentNode)]);
+    }
+
+    const queryParam =
+      (currentNode !== "rootroot0root" ? currentNode : "") +
+      moves
+        .reverse()
+        .map((move: IMove) => colorObjToStr(move))
+        .join("") +
+      "rootroot0root";
+    console.log(queryParam);
+
     axios
       .get(
-        `https://cs2wm0wty9.execute-api.us-east-1.amazonaws.com/production/rates_by_parent?parent=${currentNode}`
+        `https://cs2wm0wty9.execute-api.us-east-1.amazonaws.com/production/rates_by_parent?parent=${queryParam}`
       )
       .then((response) => {
+        console.log(response);
         setData(response.data);
       });
   }, [currentNode]);
@@ -54,7 +71,7 @@ export default function Home() {
       </Head>
       <Header />
       <Container maxW="100rem" marginTop="20px">
-        <Flex direction="column" height="86vh">
+        <Flex direction="column" minH="86vh" maxH="86vh">
           <Wrap direction="row">
             <Center>
               <WrapItem margin="50px">
@@ -66,6 +83,7 @@ export default function Home() {
                 <Box
                   overflowY="auto"
                   maxHeight="86vh"
+                  minHeight="86vh"
                   width="100%"
                   css={{
                     "&::-webkit-scrollbar": {
@@ -75,18 +93,15 @@ export default function Home() {
                 >
                   <Grid templateColumns="repeat(2, 4fr)" gap={6}>
                     {Object.keys(data).map((key, _) => {
-                      const color = key.substring(2, 3) as "B" | "W";
-                      const x =
-                        key.substring(0).charCodeAt(0) - "a".charCodeAt(0);
-                      const y =
-                        18 -
-                        (key.substring(1).charCodeAt(0) - "a".charCodeAt(0));
+                      const curr_move = colorStrToObj(key);
                       return (
                         <div>
                           <ChildStats
                             pickRate={data[key]["pick_rates"]}
                             winRate={data[key]["win_rates"]}
-                            moves={[...moves, { color, x, y }]}
+                            moves={[...moves, curr_move]}
+                            updateNode={updateNode}
+                            updateMoves={updateMoves}
                           />
                         </div>
                       );
