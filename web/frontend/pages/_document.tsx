@@ -6,7 +6,7 @@ export default class Document extends NextDocument {
     return (
       <Html>
         <Head>
-          <script type="text/javascript" src="/wgo/wgo.min.js"></script>
+          <script type="text/javascript" src="/wgo/wgo.min.js" async />
         </Head>
         <body>
           {/* Make Color mode to persists when you refresh the page. */}

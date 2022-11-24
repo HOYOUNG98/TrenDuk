@@ -38,7 +38,6 @@ export default function Home() {
   const [moves, updateMoves] = useState<Array<IMove>>([]);
 
   useEffect(() => {
-    console.log(currentNode);
     if (currentNode !== "rootroot0root") {
       updateMoves((old) => [...old, colorStrToObj(currentNode)]);
     }
@@ -50,14 +49,12 @@ export default function Home() {
         .map((move: IMove) => colorObjToStr(move))
         .join("") +
       "rootroot0root";
-    console.log(queryParam);
 
     axios
       .get(
         `https://cs2wm0wty9.execute-api.us-east-1.amazonaws.com/production/rates_by_parent?parent=${queryParam}`
       )
       .then((response) => {
-        console.log(response);
         setData(response.data);
       });
   }, [currentNode]);
@@ -95,7 +92,7 @@ export default function Home() {
                     {Object.keys(data).map((key, _) => {
                       const curr_move = colorStrToObj(key);
                       return (
-                        <div>
+                        <div key={key}>
                           <ChildStats
                             pickRate={data[key]["pick_rates"]}
                             winRate={data[key]["win_rates"]}
