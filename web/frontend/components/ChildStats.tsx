@@ -45,7 +45,7 @@ export const ChildStats: React.FC<IChildStatsProps> = ({
   moves,
 }) => {
   return (
-    <Flex>
+    <Flex gap={3}>
       <Goban size={150} moves={moves} />
       <Flex direction={"column"}>
         <PercentChart data={pickRate} />

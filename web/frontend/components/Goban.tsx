@@ -23,9 +23,9 @@ export const Goban: React.FC<IGobanProps> = ({ size, moves }) => {
         width: size,
         section: {
           top: 0,
-          left: 9,
+          left: 10,
           right: 0,
-          bottom: 9,
+          bottom: 10,
         },
       });
 
