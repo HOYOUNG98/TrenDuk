@@ -63,12 +63,15 @@ def precompute(event, _):
 
             parent = node_id[4:]
 
+            if parent not in total_counter:
+                print("??", parent)
+
             pick_rate = total_counter[node_id] / total_counter[parent]
             win_rate = win_counter[node_id]["win"] / total_counter[node_id]
 
             # (node_id, pick_rate, win_rate)
             if node_id not in precomputed_rows:
-                precomputed_rows[node_id] = [node_id] + [None] * 26
+                precomputed_rows[node_id] = [node_id] + [None] * 26 + [parent]
 
             precomputed_rows[node_id][(year-2010)*2+1] = pick_rate
             precomputed_rows[node_id][(year-2010)*2+2] = win_rate
@@ -86,14 +89,14 @@ def precompute(event, _):
         substr.append(f"win_rate_{year} INTEGER")
     substr = ", ".join(substr)
 
-    cursor.execute(f"CREATE TABLE precomputed (node_id VARCHAR(30) PRIMARY KEY, {substr});")
+    cursor.execute(f"CREATE TABLE precomputed (node_id VARCHAR(30) PRIMARY KEY, {substr}, parent_id VARCHAR(30));")
     
     rows = list(map(tuple,precomputed_rows.values()))
     
     substr = ["?"] * 26
     substr = ",".join(substr)
 
-    cursor.executemany(f"INSERT INTO precomputed VALUES (?,{substr});", rows)
+    cursor.executemany(f"INSERT INTO precomputed VALUES (?,{substr},?);", rows)
     conn.commit()
     cursor.close()
 

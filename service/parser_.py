@@ -38,7 +38,7 @@ class Parser:
             color, coordinate, game_depth = move[0], move[2:4], move[5:]
 
             # We don't want to compute all the way
-            if int(game_depth) > 10:
+            if int(game_depth) > 9:
                 continue
             
             move_instance = Node(coordinate, color, idx+1,

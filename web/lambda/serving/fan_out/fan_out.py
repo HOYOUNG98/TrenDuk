@@ -18,7 +18,7 @@ def fan_out(event, _):
     # Skip duplicate files by using visited set
     visited = set()
     os.mkdir("final")
-    year_count = {}
+    # year_count = {}
     for data in response['Contents']:
         
         os.mkdir("tmp")
@@ -32,14 +32,14 @@ def fan_out(event, _):
                 continue
             year = file[8:12]
 
-            # To work with smaller scale first we will use these lines of code
-            if year in year_count:
-                year_count[year] += 1
-            else:
-                year_count[year] = 1
+            # # To work with smaller scale first we will use these lines of code
+            # if year in year_count:
+            #     year_count[year] += 1
+            # else:
+            #     year_count[year] = 1
 
-            if year_count[year] > 10:
-                continue
+            # if year_count[year] > 10:
+            #     continue
 
             with zipfile.ZipFile(f'final/{year}.zip', 'a') as yearly_zip:
                 yearly_zip.write("tmp/" + file, file)

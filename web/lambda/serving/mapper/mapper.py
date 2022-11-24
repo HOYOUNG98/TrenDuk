@@ -5,8 +5,6 @@ import os
 import boto3
 import shutil
 
-import sys
-sys.path.append('~/Code/TrenDuk')
 from service.parser_ import Parser
 from service.type_ import Game
 
