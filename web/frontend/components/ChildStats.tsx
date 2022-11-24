@@ -1,12 +1,13 @@
 // library imports
-import { Flex } from "@chakra-ui/react";
+import { Center, Flex } from "@chakra-ui/react";
 import React, { Dispatch, SetStateAction } from "react";
-import { AreaChart, Area } from "recharts";
+import { AreaChart, Area, XAxis, YAxis } from "recharts";
 import { colorObjToStr } from "../utils/helper";
 import { Goban } from "./Goban";
 
 interface IPercentChartProps {
   data: Array<any>;
+  type: "pick" | "win";
 }
 
 interface IMove {
@@ -24,7 +25,7 @@ interface IChildStatsProps {
   updateMoves: Dispatch<SetStateAction<IMove[]>>;
 }
 
-const PercentChart: React.FC<IPercentChartProps> = ({ data }) => {
+const PercentChart: React.FC<IPercentChartProps> = ({ data, type }) => {
   return (
     <AreaChart
       width={250}
@@ -32,12 +33,14 @@ const PercentChart: React.FC<IPercentChartProps> = ({ data }) => {
       data={data}
       stackOffset="expand"
       margin={{
-        top: 10,
+        top: 0,
         right: 30,
-        left: 0,
+        left: -10,
         bottom: 0,
       }}
     >
+      <XAxis dataKey="year" domain={[2010, 2022]} />
+      <YAxis domain={type == "pick" ? [0, 0.5] : [0, 1]} />
       <Area type="monotone" dataKey="rate" stroke="#000000" fill="#000000" />
     </AreaChart>
   );
@@ -55,11 +58,13 @@ export const ChildStats: React.FC<IChildStatsProps> = ({
   return (
     <Flex gap={3}>
       <div onClick={handleBoardClick}>
-        <Goban size={150} moves={moves} />
+        <Goban size={200} moves={moves} />
       </div>
       <Flex direction={"column"}>
-        <PercentChart data={pickRate} />
-        <PercentChart data={winRate} />
+        <Center height="5">Pick Rate</Center>
+        <PercentChart data={pickRate} type="pick" />
+        <Center height="5">Win Rate</Center>
+        <PercentChart data={winRate} type="win" />
       </Flex>
     </Flex>
   );

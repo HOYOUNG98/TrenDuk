@@ -63,6 +63,9 @@ def precompute(event, _):
 
             parent = node_id[4:]
 
+            if parent not in total_counter:
+                print("??", parent)
+
             pick_rate = total_counter[node_id] / total_counter[parent]
             win_rate = win_counter[node_id]["win"] / total_counter[node_id]
 
