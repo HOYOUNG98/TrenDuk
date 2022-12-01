@@ -18,8 +18,13 @@ def rates_by_parent(event, _):
         key = d[0]
         data[key] = {"pick_rates": [], "win_rates": []}
 
-        pick_rates = d[1:-1][::2]
-        win_rates = d[1:-1][1::2]
+        d = d[2:]
+        pick_rates_numerator, pick_rates_denominator = d[::4], d[1::4]
+        win_rates_numerator, win_rates_denominator = d[2::4], d[3::4]
+
+        pick_rates = [num / denom if num and denom else None for num, denom in zip(pick_rates_numerator, pick_rates_denominator)]
+        win_rates = [num / denom if num and denom else None for num, denom in zip(win_rates_numerator, win_rates_denominator)]
+
         for i in range(13):
             data[key]['pick_rates'].append({"year":2010+i, "rate":pick_rates[i]})
             data[key]['win_rates'].append({"year":2010+i, "rate":win_rates[i]})

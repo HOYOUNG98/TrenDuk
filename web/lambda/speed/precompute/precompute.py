@@ -4,17 +4,12 @@ import boto3
 from collections import defaultdict
 import os
 
-
 # S3
 IN_BUCKET_NAME = "trenduk-serving-yearly-nodes"
 OUT_BUCKET_NAME = "trenduk-speed-yearly-rates"
+FILE_NAME = 'precomputed_v1.db'
 
-class WinCounter(object):
-    def __init__(self):
-        self.win = 0
-        self.lose = 0
-
-def precompute(event, _):
+def precompute(initial=True):
     s3_client = boto3.client('s3')
     response = s3_client.list_objects(Bucket=IN_BUCKET_NAME)
 
@@ -63,49 +58,74 @@ def precompute(event, _):
 
             parent = node_id[4:]
 
-            if parent not in total_counter:
-                print("??", parent)
-
-            pick_rate = total_counter[node_id] / total_counter[parent]
-            win_rate = win_counter[node_id]["win"] / total_counter[node_id]
-
-            # (node_id, pick_rate, win_rate)
             if node_id not in precomputed_rows:
-                precomputed_rows[node_id] = [node_id] + [None] * 26 + [parent]
+                precomputed_rows[node_id] = [node_id, parent] + [None] * 52 
 
-            precomputed_rows[node_id][(year-2010)*2+1] = pick_rate
-            precomputed_rows[node_id][(year-2010)*2+2] = win_rate
-
-
+            precomputed_rows[node_id][(year-2010)*4+2] = total_counter[node_id]
+            precomputed_rows[node_id][(year-2010)*4+3] = total_counter[parent]
+            precomputed_rows[node_id][(year-2010)*4+4] = win_counter[node_id]['win']
+            precomputed_rows[node_id][(year-2010)*4+5] = total_counter[node_id]
 
         os.remove(file_name)
     
-    conn = sqlite3.connect(f'precomputed_v1.db')
-    cursor = conn.cursor()
-
-    substr = []
-    for year in range(2010, 2023):
-        substr.append(f"pick_rate_{year} INTEGER")
-        substr.append(f"win_rate_{year} INTEGER")
-    substr = ", ".join(substr)
-
-    cursor.execute(f"CREATE TABLE precomputed (node_id VARCHAR(30) PRIMARY KEY, {substr}, parent_id VARCHAR(30));")
     
-    rows = list(map(tuple,precomputed_rows.values()))
-    
-    substr = ["?"] * 26
-    substr = ",".join(substr)
 
-    cursor.executemany(f"INSERT INTO precomputed VALUES (?,{substr},?);", rows)
-    conn.commit()
-    cursor.close()
+    if initial:
+        conn = sqlite3.connect(FILE_NAME)
+        cursor = conn.cursor()
 
-    if OUT_BUCKET_NAME not in s3_client.list_buckets():
-        s3_client.create_bucket(Bucket=OUT_BUCKET_NAME)
-        s3_client.upload_file("precomputed_v1.db", OUT_BUCKET_NAME, "precomputed_v1.db")
+        substr = []
+        for year in range(2010, 2023):
+            substr.append(f"pick_rate_numerator{year} INTEGER")
+            substr.append(f"pick_rate_denominator{year} INTEGER")
+            substr.append(f"win_rate_numerator{year} INTEGER")
+            substr.append(f"win_rate_denominator{year} INTEGER")
+        substr = ", ".join(substr)
+
+        cursor.execute(f"CREATE TABLE precomputed (node_id VARCHAR(30) PRIMARY KEY, parent_id VARCHAR(30), {substr});")
+        
+        rows = list(map(tuple,precomputed_rows.values()))
+        
+        substr = ["?"] * 52
+        substr = ",".join(substr)
+
+        cursor.executemany(f"INSERT INTO precomputed VALUES (?,?,{substr});", rows)
+        conn.commit()
+        cursor.close()
+
+        if OUT_BUCKET_NAME not in s3_client.list_buckets():
+            s3_client.create_bucket(Bucket=OUT_BUCKET_NAME)
+            s3_client.upload_file(FILE_NAME, OUT_BUCKET_NAME, FILE_NAME)
     
-    os.remove("precomputed_v1.db")
+    else:
+        s3_client.download_file(OUT_BUCKET_NAME, FILE_NAME, FILE_NAME)
+
+        conn = sqlite3.connect(FILE_NAME)
+        cursor = conn.cursor()
+
+        res = cursor.execute("SELECT node_id FROM precomputed;")
+        id_set = set(map(lambda x: x[0], res.fetchall()))
+
+        for key, val in precomputed_rows.items():
+            if key in id_set:
+                substr = []
+                for year in range(2010, 2023):
+                    substr.append(f"pick_rate_numerator{year} = pick_rate_numerator{year} + ?")
+                    substr.append(f"pick_rate_denominator{year} = pick_rate_denominator{year} + ?")
+                    substr.append(f"win_rate_numerator{year} = win_rate_numerator{year} + ?")
+                    substr.append(f"win_rate_denominator{year} = win_rate_denominator{year} + ?")
+                substr = ", ".join(substr)
+                cursor.execute(f"UPDATE precomputed SET {substr} WHERE node_id = ?", [key] + val[2:])
+            else:
+                substr = ",".join(["?"] * 52)
+                cursor.execute(f"INSERT INTO precomputed VALUES (?,?,{substr});", val)
+        conn.commit()
+        cursor.close()
+
+        s3_client.upload_file(FILE_NAME, OUT_BUCKET_NAME, FILE_NAME)
+            
+    os.rename(FILE_NAME, "../api/"+FILE_NAME)
 
 
 if __name__ == "__main__":
-    precompute(None,None)
+    precompute(False)
