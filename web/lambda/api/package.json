@@ -6,7 +6,7 @@
     "deploy": "serverless deploy --stage production"
   },
   "devDependencies": {
-    "serverless": "^3.23.0",
+    "serverless": "^3.25.1",
     "serverless-python-requirements": "^5.1.0"
   }
 }
