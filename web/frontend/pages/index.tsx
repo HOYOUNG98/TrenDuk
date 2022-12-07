@@ -71,7 +71,7 @@ export default function Home() {
         <Flex direction="column" minH="86vh" maxH="86vh">
           <Wrap direction="row">
             <Center>
-              <WrapItem margin="50px">
+              <WrapItem margin="25px">
                 <Goban size={500} moves={moves} />
               </WrapItem>
             </Center>
