@@ -6,8 +6,21 @@ def rates_by_parent(event, _):
 
     parent = event['queryStringParameters']['parent']
 
-    # query from database
-    conn = sqlite3.connect(f'precomputed_v1.db')
+    # query from realtime view database
+    realtime_conn = sqlite3.connect('realtime_view.db')
+    realtime_cursor = realtime_conn.cursor()
+
+    realtime_query = f"SELECT * FROM precomputed WHERE parent_id='{parent}';"
+    res = realtime_cursor.execute(realtime_query)
+
+    realtime_data = {}
+    for d in res.fetchall():
+        key = d[0]
+        if all(d[-4:]):
+            realtime_data[key] = {"win": d[-4] / d[-3], "pick": d[-2] / d[-1]}
+
+    # query from batch view database
+    conn = sqlite3.connect('batch_view.db')
     cursor = conn.cursor()
 
     query = f"SELECT * FROM precomputed WHERE parent_id='{parent}';"
@@ -28,6 +41,10 @@ def rates_by_parent(event, _):
         for i in range(13):
             data[key]['pick_rates'].append({"year":2010+i, "rate":pick_rates[i]})
             data[key]['win_rates'].append({"year":2010+i, "rate":win_rates[i]})
+        
+        if key in realtime_data:
+            data[key]['pick_rates'][-1]['rate'] = realtime_data[key]['pick']
+            data[key]['win_rates'][-1]['rate'] = realtime_data[key]['win']
 
 
     return {
