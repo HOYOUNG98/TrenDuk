@@ -72,7 +72,7 @@ export default function Home() {
           <Wrap direction="row">
             <Center>
               <WrapItem margin="25px">
-                <Goban size={500} moves={moves} />
+                <Goban size={400} moves={moves} />
               </WrapItem>
             </Center>
             <Center>
