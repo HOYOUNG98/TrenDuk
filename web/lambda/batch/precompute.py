@@ -84,33 +84,6 @@ def precompute():
         s3_client.create_bucket(Bucket=OUT_BUCKET_NAME)
         s3_client.upload_file(f"tmp/{date.today()}.db", OUT_BUCKET_NAME, f"{date.today()}.db")
     
-    # else:
-    #     s3_client.download_file(OUT_BUCKET_NAME, FILE_NAME, FILE_NAME)
-
-    #     conn = sqlite3.connect(FILE_NAME)
-    #     cursor = conn.cursor()
-
-    #     res = cursor.execute("SELECT node_id FROM precomputed;")
-    #     id_set = set(map(lambda x: x[0], res.fetchall()))
-
-    #     for key, val in precomputed_rows.items():
-    #         if key in id_set:
-    #             substr = []
-    #             for year in range(2010, 2023):
-    #                 substr.append(f"pick_rate_numerator{year} = pick_rate_numerator{year} + ?")
-    #                 substr.append(f"pick_rate_denominator{year} = pick_rate_denominator{year} + ?")
-    #                 substr.append(f"win_rate_numerator{year} = win_rate_numerator{year} + ?")
-    #                 substr.append(f"win_rate_denominator{year} = win_rate_denominator{year} + ?")
-    #             substr = ", ".join(substr)
-    #             cursor.execute(f"UPDATE precomputed SET {substr} WHERE node_id = ?", [key] + val[2:])
-    #         else:
-    #             substr = ",".join(["?"] * 52)
-    #             cursor.execute(f"INSERT INTO precomputed VALUES (?,?,{substr});", val)
-    #     conn.commit()
-    #     cursor.close()
-
-    #     s3_client.upload_file(FILE_NAME, OUT_BUCKET_NAME, FILE_NAME)
-            
 
 if __name__ == "__main__":
     precompute()

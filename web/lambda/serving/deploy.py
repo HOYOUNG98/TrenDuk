@@ -19,3 +19,4 @@ if __name__ == "__main__":
             latest_file_name = filename
     
     file = s3_client.download_file(IN_BUCKET_NAME, latest_file_name, "../api/batch_view.db")
+    file = s3_client.download_file(IN_BUCKET_NAME, latest_file_name, "../api/realtime_view.db")
