@@ -1,29 +1,17 @@
-from io import BytesIO
 import sqlite3
 import zipfile
 import os
-import boto3
-import shutil
 
+from tqdm import tqdm
 from service.parser_ import Parser
 from service.type_ import Game
 
-# S3
-IN_BUCKET_NAME = "trenduk-serving-yearly"
-OUT_BUCKET_NAME = "trenduk-serving-yearly-nodes"
 
-def mapper(event, _):
-    s3_client = boto3.client('s3')
-    response = s3_client.list_objects(Bucket=IN_BUCKET_NAME)
+def mapper():
 
-    os.mkdir("final")
-    for data in response['Contents']:
-        file = s3_client.get_object(Bucket=IN_BUCKET_NAME, Key=data['Key'])
-        buffer = BytesIO(file['Body'].read())
-        zipped = zipfile.ZipFile(buffer)
-
-        # Store all sgf files to tmp folder
-        zipped.extractall("tmp")
+    os.mkdir("tmp/sql_shards")
+    for source_file in tqdm(os.listdir("tmp/zip_shards")):
+        zipped = zipfile.ZipFile("tmp/zip_shards/" + source_file)
 
         games, nodes = {}, {}
         for file in zipped.namelist():
@@ -50,13 +38,9 @@ def mapper(event, _):
                             nodes[key].mergeNode(val)
                         else:
                             nodes[key] = val
-
-        shutil.rmtree("tmp")
-        '''
-            Execute queries to create db files
-        '''
-        year = data['Key'].split(".")[0]
-        conn = sqlite3.connect(f'final/{year}.db')
+        
+        year = source_file.split(".")[0]
+        conn = sqlite3.connect(f'tmp/sql_shards/{year}.db')
         cursor = conn.cursor()
 
         cursor.execute("CREATE TABLE node (node_id VARCHAR(10) PRIMARY KEY, move VARCHAR(2) NOT NULL, color VARCHAR(1) NOT NULL, sequence_depth INT);")
@@ -85,19 +69,8 @@ def mapper(event, _):
         cursor.executemany('INSERT INTO node_game VALUES (?,?,?);', node_game_rows)
         cursor.executemany('INSERT INTO is_child VALUES (?,?);', children_rows)
 
-        print(f"Inserted {cursor.rowcount} rows for year {year}")
-
         conn.commit()
         cursor.close()
 
-    if OUT_BUCKET_NAME not in s3_client.list_buckets():
-        s3_client.create_bucket(Bucket=OUT_BUCKET_NAME)
-        for file in os.listdir("final"):
-            s3_client.upload_file("final/"+file, OUT_BUCKET_NAME, file)
-            print("Uploaded with response: \n")
-
-    shutil.rmtree("final")
-
-
 if __name__ == "__main__":
-    mapper(None,None)
+    mapper()
